@@ -3,15 +3,40 @@ import {useState} from 'react';
 function App() {
     const [started,setStarted] = useState(false)
 
+    const [isRule,setIsRule] = useState(false)
+
 
     return (
         <div>
             <h1>限界しりとり</h1>
             {!started ? (
                 <div>
-                    <button onClick={() => setStarted(!started)}>ゲームを始める</button>
-                    <div></div>
-                </div>
+                    {!isRule ? (
+                        <div>
+                            <button onClick={() => setIsRule(!isRule)}>ゲームを始める</button>
+                        </div>
+                        ):(
+                        <div>
+                            <p>ルールを決めてください。</p>
+                            <input
+                                type='number'
+                                placeholder='プレイヤー1の持ち時間'
+                            >
+                            </input>
+                            <input
+                                type='number'
+                                placeholder='プレイヤー2の持ち時間'
+                            >
+                            </input>
+                            <button
+                                onClick={() => {
+                                    setIsRule(!isRule);
+                                    setStarted(!started);
+                                }}
+                                >スタート</button>
+                        </div>
+                    )}
+                </div>    
                 ):(
                 <div>
                     <div>
