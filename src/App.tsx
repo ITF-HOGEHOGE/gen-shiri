@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Mode } from '.';
+import Game from "./components/Game"
 
 function App() {
-    const [mode, setMode] = useState<Mode>("start")
-
+    const [mode, setMode] = useState<Mode>("start");
 
     return (
         <div>
@@ -32,22 +32,7 @@ function App() {
                             }}
                         >スタート</button>
                     </div>)
-                :   (<div>
-                        <div>
-                            <div>プレイヤー1 残り時間 5:00</div>
-                            <div>プレイヤー2 残り時間 5:00</div>
-                        </div>
-                        <p>プレイヤー1の番です。</p>
-                        <div>
-                            <input
-                            type='text'
-                            placeholder="回答してください"
-                            >
-                            </input>
-                            <button>回答</button>
-                        </div>
-                        <button onClick={() => setMode("start")}>中断する</button>
-                    </div>)
+                :   <Game times={[0, 0]} setModeStart={() => setMode("start")}></Game>
             }
         </div>
     );

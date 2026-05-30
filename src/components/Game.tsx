@@ -1,30 +1,77 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Player from "./Player";
+import { PlayerRef } from "./index"
 
-function Game() {
+function Game(props: {
+    times: number[],
+    setModeStart: () => void
+}) {
+    const [requestLen, setRequestLen] = useState<number>(5);
+    const [requestHead, setRequestHead] = useState<string>("り");
+    const [inputText, setInputText] = useState<string>("");
+    const checkInput = (input: string) => {
+        if (input.length !== requestLen) {
+            alert(`${requestLen}文字の言葉を入力してください。`);
+            return;
+        }
+        if (input[0] !== requestHead) {
+            alert(`${requestHead}から始まる言葉を入力してください。`);
+            return;
+        }
+        setRequestHead(input[input.length - 1]);
+        setInputText("");
+        passTurn();
+    };
     const passTurn = () => {
-        endTurnArray.current[turn.current]();
-        turn.current = 1 - turn.current;
-        startTurnArray.current[turn.current]();
+        playerRefs[turn.current].current?.endTurn();
+        switchTurn();
+        playerRefs[turn.current].current?.startTurn();
     };
     const turn = useRef<number>(0);
-    const startTurnArray = useRef<(() => void | null)[]>([() => {}, () => {}]);
-    const endTurnArray = useRef<(() => void | null)[]>([() => {}, () => {}]);
+    const switchTurn = () => {
+        turn.current = 1 - turn.current;
+    };
+    const playerRefs = [useRef<PlayerRef | null>(null), useRef<PlayerRef | null>(null)];
+    const genPlayerData = (index: number) => ({
+        id: index + 1,
+        time: props.times[index]
+    });
+
+    useEffect(() => {
+        playerRefs[0].current?.startTurn();
+    }, []);
 
     return(
-        <>
-            <Player 
-                playerNumber={1}
-                setStartTurn={(startTurn: () => void) => startTurnArray.current[0] = startTurn}
-                setEndTurn={(endTurn: () => void) => endTurnArray.current[0] = endTurn}
-            ></Player>
-            <Player 
-                playerNumber={2}
-                setStartTurn={(startTurn: () => void) => startTurnArray.current[1] = startTurn}
-                setEndTurn={(endTurn: () => void) => endTurnArray.current[1] = endTurn}
-            ></Player>
-            <button onClick={passTurn}>Pass</button>
-        </>
+        <div>
+            <div>
+                <Player 
+                    playerData={genPlayerData(0)}
+                    ref={playerRefs[0]}
+                ></Player>
+                <Player 
+                    playerData={genPlayerData(1)}
+                    ref={playerRefs[1]}
+                ></Player>
+            </div>
+            <p>プレイヤー{turn.current + 1}の番です。</p>
+            <p>文字数: {requestLen}</p>
+            <p>最初の文字: {requestHead}</p>
+            <div>
+                <input
+                    type='text'
+                    placeholder="回答してください"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)} 
+                >
+                </input>
+                {/* submitにするとstartに戻る */}
+                <button type="button" onClick={() => checkInput(inputText)}>回答</button>
+            </div>
+            <button type="button" onClick={() => {
+                console.log("Check");
+                props.setModeStart();
+            }}>中断する</button>
+        </div>
     )
 }
 

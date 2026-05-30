@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { PlayerData } from ".";
 
-function Player(props: {
-    playerNumber: number,
-    setStartTurn: (startTurn: () => void) => void,
-    setEndTurn: (endTurn: () => void) => void,
-}) {
+const Player = forwardRef((props: {
+    playerData: PlayerData
+}, ref) =>  {
     const [time, setTime] = useState<number>(500);
     const intervalId = useRef<number | null>(null);
     const startTurn = () => {
-        intervalId.current = setInterval(() => {
-            setTime((pre) => pre - 1);
-        }, 1000);
+        if (intervalId.current === null) {
+            intervalId.current = setInterval(() => {
+                setTime((pre) => pre - 1);
+            }, 1000);
+        }
     };
     const endTurn = () => {
         if (intervalId.current !== null) {
@@ -18,15 +19,12 @@ function Player(props: {
             intervalId.current = null;
         }
     };
-
-    useEffect(() => {
-        props.setStartTurn(startTurn);
-        props.setEndTurn(endTurn);
-    }, [])
+    
+    useImperativeHandle(ref, () => ({startTurn, endTurn}));
 
     return (
-        <div>プレイヤー{props.playerNumber} 残り{time}秒</div>
+        <div>プレイヤー{props.playerData.id} 残り{time}秒</div>
     )
-}
+});
 
 export default Player;
