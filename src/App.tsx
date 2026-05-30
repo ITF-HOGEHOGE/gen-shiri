@@ -8,7 +8,8 @@ function App() {
     return (
         <div>
             <h1>限界しりとり</h1>
-            {mode == "start" 
+            {
+                mode == "start" 
                 ?   (<div>
                         <button onClick={() => setMode("setting")}>ゲームを始める</button>
                     </div>)
