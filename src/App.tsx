@@ -2,8 +2,28 @@ import { useState } from 'react';
 import { Mode } from '.';
 
 function App() {
-    const [mode, setMode] = useState<Mode>("start")
+    const [mode, setMode] = useState<Mode>("start");
 
+    const [answer,setAnswer] = useState('');
+
+    async function checkWord(word) {
+        const url = `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        return data[1].length > 0;
+    }
+
+    async function judgeWord(){
+        const exists = await checkWord(answer);
+
+        if (exists) {
+            alert('有効な単語です')
+        }else{
+            alert('その単語は見つかりません')
+        }
+    }
 
     return (
         <div className='app'>
@@ -48,10 +68,12 @@ function App() {
                         <div className='answer-area'>
                             <input
                             type='text'
+                            value={answer}
+                            onChange={(e) => setAnswer(e.target.value)}
                             placeholder="回答してください"
                             >
                             </input>
-                            <button>回答</button>
+                            <button onClick={judgeWord}>回答</button>
                         </div>
                         <button className='stop-btn' onClick={() => setMode("start")}>中断する</button>
                     </div>)
