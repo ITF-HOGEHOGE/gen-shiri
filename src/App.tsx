@@ -6,7 +6,7 @@ function App() {
 
 
     return (
-        <div>
+        <div className='app'>
             <h1>限界しりとり</h1>
             {
                 mode == "start" 
@@ -32,13 +32,20 @@ function App() {
                             }}
                         >スタート</button>
                     </div>)
-                :   (<div>
-                        <div>
-                            <div>プレイヤー1 残り時間 5:00</div>
-                            <div>プレイヤー2 残り時間 5:00</div>
+                :   (<div>          
+                        <div className="timer-area">
+                            <div className="timer">
+                                プレイヤー1<br />
+                                5:00
+                            </div>
+
+                            <div className="timer">
+                                プレイヤー2<br />
+                                5:00
+                            </div>
                         </div>
-                        <p>プレイヤー1の番です。</p>
-                        <div>
+                        <p className='turn'>プレイヤー1の番です。</p>
+                        <div className='answer-area'>
                             <input
                             type='text'
                             placeholder="回答してください"
@@ -46,7 +53,7 @@ function App() {
                             </input>
                             <button>回答</button>
                         </div>
-                        <button onClick={() => setMode("start")}>中断する</button>
+                        <button className='stop-btn' onClick={() => setMode("start")}>中断する</button>
                     </div>)
             }
         </div>
