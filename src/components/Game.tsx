@@ -14,10 +14,12 @@ function Game() {
     return(
         <>
             <Player 
+                playerNumber={1}
                 setStartTurn={(startTurn: () => void) => startTurnArray.current[0] = startTurn}
                 setEndTurn={(endTurn: () => void) => endTurnArray.current[0] = endTurn}
             ></Player>
             <Player 
+                playerNumber={2}
                 setStartTurn={(startTurn: () => void) => startTurnArray.current[1] = startTurn}
                 setEndTurn={(endTurn: () => void) => endTurnArray.current[1] = endTurn}
             ></Player>
