@@ -1,60 +1,53 @@
-import {useState} from 'react';
+import { useState } from 'react';
+import { Mode } from './app';
 
 function App() {
-    const [started,setStarted] = useState(false)
-
-    const [isRule,setIsRule] = useState(false)
+    const [mode, setMode] = useState<Mode>("start")
 
 
     return (
         <div>
             <h1>限界しりとり</h1>
-            {!started ? (
-                <div>
-                    {!isRule ? (
-                        <div>
-                            <button onClick={() => setIsRule(!isRule)}>ゲームを始める</button>
-                        </div>
-                        ):(
-                        <div>
-                            <p>ルールを決めてください。</p>
-                            <input
-                                type='number'
-                                placeholder='プレイヤー1の持ち時間'
-                            >
-                            </input>
-                            <input
-                                type='number'
-                                placeholder='プレイヤー2の持ち時間'
-                            >
-                            </input>
-                            <button
-                                onClick={() => {
-                                    setIsRule(!isRule);
-                                    setStarted(!started);
-                                }}
-                                >スタート</button>
-                        </div>
-                    )}
-                </div>    
-                ):(
-                <div>
-                    <div>
-                        <div>プレイヤー1 残り時間 5:00</div>
-                        <div>プレイヤー2 残り時間 5:00</div>
-                    </div>
-                    <p>プレイヤー1の番です。</p>
-                    <div>
+            {mode == "start" 
+                ?   (<div>
+                        <button onClick={() => setMode("setting")}>ゲームを始める</button>
+                    </div>)
+                : mode == "setting"
+                ?   (<div>
+                        <p>ルールを決めてください。</p>
                         <input
-                        type='text'
-                        placeholder="回答してください"
+                            type='number'
+                            placeholder='プレイヤー1の持ち時間'
                         >
                         </input>
-                        <button>回答</button>
-                    </div>
-                    <button onClick={() => setStarted(!started)}>中断する</button>
-                </div>
-            )}
+                        <input
+                            type='number'
+                            placeholder='プレイヤー2の持ち時間'
+                        >
+                        </input>
+                        <button
+                            onClick={() => {
+                                setMode("game");
+                            }}
+                        >スタート</button>
+                    </div>)
+                :   (<div>
+                        <div>
+                            <div>プレイヤー1 残り時間 5:00</div>
+                            <div>プレイヤー2 残り時間 5:00</div>
+                        </div>
+                        <p>プレイヤー1の番です。</p>
+                        <div>
+                            <input
+                            type='text'
+                            placeholder="回答してください"
+                            >
+                            </input>
+                            <button>回答</button>
+                        </div>
+                        <button onClick={() => setMode("start")}>中断する</button>
+                    </div>)
+            }
         </div>
     );
 }
