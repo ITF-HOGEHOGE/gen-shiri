@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mode } from './app';
+import { Mode } from '.';
 
 function App() {
     const [mode, setMode] = useState<Mode>("start")
@@ -13,7 +13,7 @@ function App() {
                 ?   (<div>
                         <button onClick={() => setMode("setting")}>ゲームを始める</button>
                     </div>)
-                : mode == "setting"
+                :   mode == "setting"
                 ?   (<div>
                         <p>ルールを決めてください。</p>
                         <input
