@@ -1,9 +1,15 @@
 import { useState } from "react";
 
 function Input(props: {
-    passTurn: () => void
+    passTurn: () => void,
+    wordLength:[number,number]
 }) {
-    const [requestLen, setRequestLen] = useState<number>(5);
+    function getRandomLength() {
+        const [min,max] = props.wordLength;
+        return Math.floor(Math.random()*(max-min+1))+min
+    }
+
+    const [requestLen, setRequestLen] = useState<number>(getRandomLength());
     const [requestHead, setRequestHead] = useState<string>("り");
     const checkInput = (input: string) => {
         if (input.length !== requestLen) {
@@ -15,6 +21,7 @@ function Input(props: {
             return;
         }
         setRequestHead(input[input.length - 1]);
+        setRequestLen(getRandomLength())
         clearInput();
         props.passTurn();
     };
