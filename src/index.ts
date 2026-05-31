@@ -1,1 +1,1 @@
-export type Mode = "start" | "setting" | "game";
+export type Mode = "start" | "setting" | "game" | "result";

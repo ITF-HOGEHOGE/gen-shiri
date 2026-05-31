@@ -77,6 +77,14 @@ function App() {
                             }}
                         >スタート</button>
                     </div>)
+                :   mode == "result"
+                ?   (<div className='result-card'>
+                        <h2>時間切れ・・・</h2>
+                        <p className='winner'>結果 プレイヤー1の勝ち!</p>
+                        <p className='time'>プレイヤー1の残り時間:</p>
+                        <p className='time'>プレイヤー2の残り時間:</p>
+                        <button onClick={() => setMode("start")}>タイトルに戻る</button>
+                    </div>)
                 :   <Game times={[Number(inputTime1), Number(inputTime2)]} wordLendth={[Number(minWordLength),Number(maxWordLength)]} setModeStart={() => setMode("start")}></Game>
             }
         </div>
