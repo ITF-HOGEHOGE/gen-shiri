@@ -3,7 +3,7 @@ import { PlayerData } from ".";
 
 const Player = forwardRef((props: {
     playerData: PlayerData
-}, ref) =>  {
+}, ref) => {
     const [time, setTime] = useState<number>(500);
     const intervalId = useRef<number | null>(null);
     const startTurn = () => {
