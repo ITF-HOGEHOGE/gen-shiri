@@ -7,6 +7,10 @@ function App() {
 
     const [answer,setAnswer] = useState('');
 
+    const [inputTime1,setInputTime1] = useState('');
+    const [inputTime2,setInputTime2] = useState('');
+    
+
     async function checkWord(word: string) {
         const url = `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
 
@@ -40,11 +44,15 @@ function App() {
                         <input
                             type='number'
                             placeholder='プレイヤー1の持ち時間'
+                            value={inputTime1}
+                            onChange={(e) => setInputTime1(e.target.value)}
                         >
                         </input>
                         <input
                             type='number'
                             placeholder='プレイヤー2の持ち時間'
+                            value={inputTime2}
+                            onChange={(e) => setInputTime2(e.target.value)}
                         >
                         </input>
                         <button
@@ -53,7 +61,7 @@ function App() {
                             }}
                         >スタート</button>
                     </div>)
-                :   <Game times={[0, 0]} setModeStart={() => setMode("start")}></Game>
+                :   <Game times={[Number(inputTime1), Number(inputTime2)]} setModeStart={() => setMode("start")}></Game>
             }
         </div>
     );
