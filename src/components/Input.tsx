@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { useState } from "react";
 
 function Input(props: {
     passTurn: () => void
@@ -19,10 +19,12 @@ function Input(props: {
         props.passTurn();
     };
     const [inputText, setInputText] = useState<string>("");
-    const [inputHiraganaText, setInputInraganaText] = useState<string>("");
+    const [inputTextTmp, setInputTextTmp] = useState<string>("");
+    const [inputTextHiragana, setInputTextHiragana] = useState<string>("");
+    const [inputTextHiraganaTmp, setInputTextHiraganaTmp] = useState<string>("");
     const clearInput = () => {
         setInputText("");
-        setInputInraganaText("");
+        setInputTextHiragana("");
     };
     const hiraganaRegex = /^\p{scx=Hiragana}+$/u;
 
@@ -31,23 +33,48 @@ function Input(props: {
             <p>文字数: {requestLen}</p>
             <p>最初の文字: {requestHead}</p>
             <div>
+                <p>ひらがな表示です。</p>
                 <input
                     type="text"
-                    value={inputHiraganaText}
+                    value={inputTextHiragana + inputTextHiraganaTmp}
                     disabled={inputText.length === 0}
+                    onChange={(e) => {
+                        setInputTextHiragana(e.target.value);
+                    }}
                 />
                 <input
                     type='text'
                     placeholder="回答してください"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)} 
+                    value={inputText + inputTextTmp}
+                    onChange={(e) => {
+                        const eventValue = e.target.value;
+                        if (inputText.length === 0) {
+                            setInputTextTmp(eventValue);
+                            return;
+                        }
+                        let nowIndex = 0;
+                        while (inputText[nowIndex] === eventValue[nowIndex]) {
+                            nowIndex += 1;
+                            if (nowIndex === inputText.length) {
+                                setInputTextTmp(eventValue.slice(nowIndex));
+                                return;
+                            }
+                        }
+                        setInputText((pre) => pre.slice(0, nowIndex));
+                    }}
                     onCompositionUpdate={(e) => {
                         if (hiraganaRegex.test(e.data)) {
-                            setInputInraganaText(e.data);
+                            setInputTextHiraganaTmp(e.data);
                         }
                     }}
+                    onCompositionEnd={() => {
+                        setInputText((pre) => pre + inputTextTmp);
+                        setInputTextTmp("");
+                        setInputTextHiragana((pre) => pre + inputTextHiraganaTmp);
+                        setInputTextHiraganaTmp("");
+                    }}
                 />
-                <button type="button" onClick={() => checkInput(inputHiraganaText)}>回答</button>
+                <button type="button" onClick={() => checkInput(inputTextHiragana + inputTextHiraganaTmp)}>回答</button>
             </div>
         </>
     )
