@@ -31,7 +31,11 @@ function Input(props: {
             <p>文字数: {requestLen}</p>
             <p>最初の文字: {requestHead}</p>
             <div>
-                <p>{inputHiraganaText}</p>
+                <input
+                    type="text"
+                    value={inputHiraganaText}
+                    disabled={inputText.length === 0}
+                />
                 <input
                     type='text'
                     placeholder="回答してください"
@@ -42,8 +46,7 @@ function Input(props: {
                             setInputInraganaText(e.data);
                         }
                     }}
-                >
-                </input>
+                />
                 <button type="button" onClick={() => checkInput(inputHiraganaText)}>回答</button>
             </div>
         </>
