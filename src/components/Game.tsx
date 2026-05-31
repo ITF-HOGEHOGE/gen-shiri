@@ -6,7 +6,8 @@ import Input from "./Input";
 function Game(props: {
     times: number[],
     wordLength:[number,number],
-    setModeStart: () => void
+    setModeStart: () => void,
+    setModeResult: () => void,
 }) {
     const passTurn = () => {
         playerRefs[turn.current].current?.endTurn();
