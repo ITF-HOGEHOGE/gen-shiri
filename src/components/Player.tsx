@@ -4,7 +4,7 @@ import { PlayerData } from ".";
 const Player = forwardRef((props: {
     playerData: PlayerData
 }, ref) => {
-    const [time, setTime] = useState<number>(500);
+    const [time, setTime] = useState<number>(props.playerData.time);
     const intervalId = useRef<number | null>(null);
     const startTurn = () => {
         if (intervalId.current === null) {
