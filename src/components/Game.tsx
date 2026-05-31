@@ -5,6 +5,7 @@ import Input from "./Input";
 
 function Game(props: {
     times: number[],
+    wordLength:[number,number],
     setModeStart: () => void
 }) {
     const passTurn = () => {
@@ -39,7 +40,7 @@ function Game(props: {
                 />
             </div>
             <p>プレイヤー{turn.current + 1}の番です。</p>
-            <Input passTurn={passTurn}/>
+            <Input passTurn={passTurn} wordLength={props.wordLength}/>
             <button type="button" onClick={props.setModeStart}>中断する</button>
         </div>
     )
