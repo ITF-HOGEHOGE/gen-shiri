@@ -9,6 +9,7 @@ function Game(props: {
     const [requestLen, setRequestLen] = useState<number>(5);
     const [requestHead, setRequestHead] = useState<string>("り");
     const [inputText, setInputText] = useState<string>("");
+    const [inputHiraganaText, setInputInraganaText] = useState<string>("");
     const checkInput = (input: string) => {
         if (input.length !== requestLen) {
             alert(`${requestLen}文字の言葉を入力してください。`);
@@ -36,6 +37,7 @@ function Game(props: {
         id: index + 1,
         time: props.times[index]
     });
+    const regex = /^\p{scx=Hiragana}+$/u;
 
     useEffect(() => {
         playerRefs[0].current?.startTurn();
@@ -62,15 +64,17 @@ function Game(props: {
                     placeholder="回答してください"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)} 
+                    onCompositionUpdate={(e) => {
+                        if (regex.test(e.data)) {
+                            setInputInraganaText(e.data);
+                        }
+                    }}
                 >
                 </input>
-                {/* submitにするとstartに戻る */}
+                <p><br/><br/><br/><br/>{inputHiraganaText}</p>
                 <button type="button" onClick={() => checkInput(inputText)}>回答</button>
             </div>
-            <button type="button" onClick={() => {
-                console.log("Check");
-                props.setModeStart();
-            }}>中断する</button>
+            <button type="button" onClick={props.setModeStart}>中断する</button>
         </div>
     )
 }
