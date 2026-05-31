@@ -9,6 +9,8 @@ function App() {
 
     const [inputTime1,setInputTime1] = useState('');
     const [inputTime2,setInputTime2] = useState('');
+    const [minWordLength,setMinWordLength] = useState('');
+    const [maxWordLength,setMaxWordLength] = useState('');
     
 
     async function checkWord(word: string) {
@@ -55,13 +57,27 @@ function App() {
                             onChange={(e) => setInputTime2(e.target.value)}
                         >
                         </input>
+                        <input
+                            type='number'
+                            placeholder='最小の文字数(2以上)'
+                            value={minWordLength}
+                            onChange={(e) => setMinWordLength(e.target.value)}
+                        >
+                        </input>
+                        <input
+                            type='number'
+                            placeholder='最大の文字数(2以上)'
+                            value={maxWordLength}
+                            onChange={(e) => setMaxWordLength(e.target.value)}
+                        >
+                        </input>
                         <button
                             onClick={() => {
                                 setMode("game");
                             }}
                         >スタート</button>
                     </div>)
-                :   <Game times={[Number(inputTime1), Number(inputTime2)]} setModeStart={() => setMode("start")}></Game>
+                :   <Game times={[Number(inputTime1), Number(inputTime2)]} wordLendth={[Number(minWordLength),Number(maxWordLength)]} setModeStart={() => setMode("start")}></Game>
             }
         </div>
     );
