@@ -7,6 +7,7 @@ function Game(props: {
     times: [number, number],
     wordLength:[number, number],
     setModeStart: () => void
+    setModeResult: () => void,
 }) {
     const passTurn = () => {
         playerRefs[turn.current].current?.endTurn();

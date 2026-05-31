@@ -71,9 +71,22 @@ function App() {
                             onChange={(e) => setMaxWordLength(e.target.value)}
                         >
                         </input>
+                        <p>プレイヤー1とプレイヤー2を決めたら、スタートを押してください</p>
                         <button
                             onClick={() => {
-                                if (minWordLength>maxWordLength){
+                                if (!minWordLength||!maxWordLength||!inputTime1||!inputTime2){
+                                    alert('項目に空欄があります');
+                                    return;
+                                }
+                                if (Number(inputTime1)<=0||Number(inputTime2)<=0){
+                                    alert('持ち時間は正の数で入力してください');
+                                    return;
+                                }
+                                if (Number(maxWordLength)<=1||Number(minWordLength)<=1){
+                                    alert('文字数は2以上で入力してください');
+                                    return;
+                                }
+                                if (Number(minWordLength)>Number(maxWordLength)){
                                     alert('最小文字数は最大文字数以下にしてください');
                                     return;
                                 }
@@ -89,7 +102,11 @@ function App() {
                         <p className='time'>プレイヤー2の残り時間:</p>
                         <button onClick={() => setMode("start")}>タイトルに戻る</button>
                     </div>)
-                :   <Game times={[Number(inputTime1), Number(inputTime2)]} wordLength={[Number(minWordLength),Number(maxWordLength)]} setModeStart={() => setMode("start")}></Game>
+                :   <Game 
+                        times={[Number(inputTime1), Number(inputTime2)]} 
+                        wordLength={[Number(minWordLength),Number(maxWordLength)]} 
+                        setModeStart={() => setMode("start")} 
+                    />
             }
         </div>
     );
