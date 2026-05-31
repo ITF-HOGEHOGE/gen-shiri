@@ -77,7 +77,7 @@ function App() {
                             }}
                         >スタート</button>
                     </div>)
-                :   <Game times={[Number(inputTime1), Number(inputTime2)]} wordLendth={[Number(minWordLength),Number(maxWordLength)]} setModeStart={() => setMode("start")}></Game>
+                :   <Game times={[Number(inputTime1), Number(inputTime2)]} wordLength={[Number(minWordLength),Number(maxWordLength)]} setModeStart={() => setMode("start")}></Game>
             }
         </div>
     );
