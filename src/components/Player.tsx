@@ -5,8 +5,11 @@ const Player = forwardRef((props: {
     playerData: PlayerData,
     setModeResult: () => void
 }, ref) => {
+    // 残り時間
     const [time, setTime] = useState<number>(props.playerData.time);
+    // 時間を減らす定期実行のid
     const intervalId = useRef<number | null>(null);
+    // このプレイヤーのターンを始める
     const startTurn = () => {
         if (intervalId.current === null) {
             intervalId.current = setInterval(() => {
@@ -14,17 +17,20 @@ const Player = forwardRef((props: {
             }, 1000);
         }
     };
+    // このプレイヤーのターンを終わる
     const endTurn = () => {
         if (intervalId.current !== null) {
             clearInterval(intervalId.current);
             intervalId.current = null;
         }
     };
+    // 残り時間を取得
     const getTime = () => {
         return time;
     };
     
     useImperativeHandle(ref, () => ({startTurn, endTurn, getTime}));
+    // 残り時間が0なら結果画面へ
     useEffect(() => {
         if (time === 0) {
             endTurn();
