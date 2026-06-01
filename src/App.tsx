@@ -29,9 +29,7 @@ function App() {
         }
     };
 
-    // const [answer, setAnswer] = useState('');
-
-    
+    // const [answer, setAnswer] = useState('');    
     // async function checkWord(word: string) {
     //     // wikipediaの存在を判定する
     //     const url: string = `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;

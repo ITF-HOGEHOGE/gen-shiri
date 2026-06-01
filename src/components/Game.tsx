@@ -1,8 +1,9 @@
 import { useEffect, useRef ,useState } from "react";
 import { PlayerRef } from "./index";
+import { SetModeWrapper } from "..";
 import Player from "./Player";
 import Input from "./Input";
-import { SetModeWrapper } from "..";
+import "./Game.css";
 
 function Game (props: {
     times: [number, number],
@@ -10,8 +11,8 @@ function Game (props: {
     wordLength2:[number,number],
     setModeWrapper: SetModeWrapper
 }) {
-    const [usedWords,setUsedWords] = useState<Set<string>>(new Set());
-    const [isPaused,setIsPaused] = useState(false);
+    const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
+    const [isPaused, setIsPaused] = useState(false);
     // 次のターンに進む
     const passTurn = () => {
         playerRefs[turn].current?.endTurn();
@@ -38,13 +39,12 @@ function Game (props: {
     const setModeResult = () => {
         props.setModeWrapper("result", [playerRefs[0].current!.getTime(), playerRefs[1].current!.getTime()]);
     };
-
+    // ゲームを一時停止
     const pauseGame = () => {
-        playerRefs[0].current?.endTurn();
-        playerRefs[1].current?.endTurn();
+        playerRefs[turn].current?.endTurn();
         setIsPaused(true);
     }
-
+    // ゲームを再開
     const resumeGame = () => {
         playerRefs[turn].current?.startTurn();
         setIsPaused(false);
@@ -57,12 +57,13 @@ function Game (props: {
 
     return(
         <div>
-            <div>
+            <div className="game-player-container">
                 <Player 
                     playerData={genPlayerData(0)}
                     setModeResult={setModeResult}
                     ref={playerRefs[0]}
                 />
+                <div className="game-empty" />
                 <Player
                     playerData={genPlayerData(1)}
                     setModeResult={setModeResult}
