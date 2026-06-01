@@ -10,6 +10,7 @@ function Game (props: {
     setModeWrapper: SetModeWrapper
 }) {
     const [usedWords,setUsedWords] = useState<Set<string>>(new Set());
+    const [isPaused,setIsPaused] = useState(false);
     // 次のターンに進む
     const passTurn = () => {
         playerRefs[turn.current].current?.endTurn();
@@ -37,6 +38,17 @@ function Game (props: {
         props.setModeWrapper("result", [playerRefs[0].current!.getTime(), playerRefs[1].current!.getTime()]);
     };
 
+    const pauseGame = () => {
+        playerRefs[0].current?.endTurn();
+        playerRefs[1].current?.endTurn();
+        setIsPaused(true);
+    }
+
+    const resumeGame = () => {
+        playerRefs[turn.current].current?.startTurn();
+        setIsPaused(false);
+    }
+
     // 初回レンダリング時にターン開始
     useEffect(() => {
         playerRefs[0].current?.startTurn();
@@ -63,7 +75,18 @@ function Game (props: {
                 usedWords={usedWords}
                 setUsedWords={setUsedWords}
             />
-            <button type="button" onClick={() => props.setModeWrapper("start")}>中断する</button>
+            <button type="button" onClick={() => props.setModeWrapper("start")}>ゲームをやめる</button>
+            <button
+                onClick = {() => {
+                    if (isPaused) {
+                        resumeGame();
+                    }else{
+                        pauseGame();
+                    }
+                }}
+            >
+                {isPaused ? '再開' : '一時停止'}
+            </button>
         </div>
     )
 };
