@@ -64,8 +64,12 @@ function Input(props: {
         const convertedWord = inputText + inputTextTmp;
         const exists = await checkWord(convertedWord);
         if (!exists) {
-            alert('その単語は見つかりません')
-            return;
+            const approved = window.confirm(
+                `「${convertedWord}」は見つかりませんでした。\n両者合意の下で有効な単語として認めますか？`
+            );
+            if (!approved){
+                return;
+            }
         }
         const nextHead = getNextHead(input);
         if (nextHead === 'ん'){
