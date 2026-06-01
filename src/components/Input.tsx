@@ -2,7 +2,11 @@ import { useState } from "react";
 
 function Input(props: {
     passTurn: () => void,
-    wordLength:[number,number]
+    wordLength:[number,number],
+    usedWords:Set<string>,
+    setUsedWords: React.Dispatch<
+        React.SetStateAction<Set<string>>
+    >
 }) {
     function getRandomLength() {
         const [min,max] = props.wordLength;
@@ -28,12 +32,21 @@ function Input(props: {
             alert(`${requestHead}から始まる言葉を入力してください。`);
             return;
         }
+        if (props.usedWords.has(input)) {
+            alert('その言葉は既に使われています')
+            return;
+        }
         const convertedWord = inputText+inputTextTmp;
         const exists = await checkWord(convertedWord);
         if (!exists) {
             alert('その単語は見つかりません')
             return;
         }
+        props.setUsedWords((prev) => {
+            const next = new Set(prev);
+            next.add(input);
+            return next;
+        })
         setRequestHead(input[input.length - 1]);
         setRequestLen(getRandomLength())
         clearInput();
