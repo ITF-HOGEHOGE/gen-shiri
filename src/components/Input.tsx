@@ -9,15 +9,29 @@ function Input(props: {
         return Math.floor(Math.random()*(max-min+1))+min
     }
 
+    async function checkWord(word: string) {
+        const url =
+            `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data[1].length > 0;
+    }
+
     const [requestLen, setRequestLen] = useState<number>(getRandomLength());
     const [requestHead, setRequestHead] = useState<string>("り");
-    const checkInput = (input: string) => {
+    const checkInput = async (input: string) => {
         if (input.length !== requestLen) {
             alert(`${requestLen}文字の言葉を入力してください。`);
             return;
         }
         if (input[0] !== requestHead) {
             alert(`${requestHead}から始まる言葉を入力してください。`);
+            return;
+        }
+        const convertedWord = inputText+inputTextTmp;
+        const exists = await checkWord(convertedWord);
+        if (!exists) {
+            alert('その単語は見つかりません')
             return;
         }
         setRequestHead(input[input.length - 1]);
