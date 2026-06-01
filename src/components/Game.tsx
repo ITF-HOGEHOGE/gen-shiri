@@ -75,7 +75,6 @@ function Game (props: {
                 usedWords={usedWords}
                 setUsedWords={setUsedWords}
             />
-            <button type="button" onClick={() => props.setModeWrapper("start")}>ゲームをやめる</button>
             <button
                 onClick = {() => {
                     if (isPaused) {
@@ -87,6 +86,7 @@ function Game (props: {
             >
                 {isPaused ? '再開' : '一時停止'}
             </button>
+            <button type="button" onClick={() => props.setModeWrapper("start")}>ゲームをやめる</button>
         </div>
     )
 };
