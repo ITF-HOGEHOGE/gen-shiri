@@ -47,9 +47,16 @@ function Input(props: {
     // 入力が適切か判定
     const checkInput = async (input: string) => {
         // 文字列の長さチェック
-        if (input.length !== requestLen) {
-            alert(`${requestLen}文字の言葉を入力してください。`);
-            return;
+        if (requestLen === props.wordLength[1]) {
+            if (input.length < requestLen) {
+                alert(`${requestLen}文字以上の言葉を入力してください`);
+                return;
+            }
+        }else{
+            if (input.length !== requestLen) {
+                alert(`${requestLen}文字以上の言葉を入力してください`);
+                return;
+            }
         }
         // 頭文字チェック
         if (input[0] !== requestHead) {
@@ -136,7 +143,7 @@ function Input(props: {
 
     return (
         <>
-            <p>文字数: {requestLen}</p>
+            <p>文字数: {requestLen === props.wordLength[1] ? `${requestLen}文字以上` : `${requestLen}文字`}</p>
             <p>最初の文字: {requestHead}</p>
             <div>
                 <p>ひらがな表示です。</p>
