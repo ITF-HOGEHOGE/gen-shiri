@@ -13,6 +13,26 @@ function Input(props: {
         return Math.floor(Math.random()*(max-min+1))+min
     }
 
+    function getNextHead(word:string) {
+        let last = word[word.length-1];
+        if (last === 'ー') {
+            last = word[word.length-2];
+        }
+        const smallToLarge: Record<string,string> = {
+            "ぁ": "あ",
+            "ぃ": "い",
+            "ぅ": "う",
+            "ぇ": "え",
+            "ぉ": "お",
+            "ゃ": "や",
+            "ゅ": "ゆ",
+            "ょ": "よ",
+            "っ": "つ",
+            "ゎ": "わ",
+        }
+        return smallToLarge[last] ?? last;
+    }
+
     async function checkWord(word: string) {
         const url =
             `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
@@ -42,12 +62,17 @@ function Input(props: {
             alert('その単語は見つかりません')
             return;
         }
+        const nextHead = getNextHead(input);
+        if (nextHead === 'ん'){
+            alert('「ん」で終わっています')
+            return;
+        }
         props.setUsedWords((prev) => {
             const next = new Set(prev);
             next.add(input);
             return next;
         })
-        setRequestHead(input[input.length - 1]);
+        setRequestHead(nextHead)
         setRequestLen(getRandomLength())
         clearInput();
         props.passTurn();
