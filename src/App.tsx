@@ -61,7 +61,7 @@ function App() {
                 :   mode.mode === "result"
                 ?   <div className='result-card'>
                         <h2>時間切れ・・・</h2>
-                        <p className='winner'>結果 プレイヤー1の勝ち!</p>
+                        <p className='winner'>結果{mode.times[1]===0 ? 'プレイヤー1' : 'プレイヤー2'}の勝ち!</p>
                         <p className='time'>プレイヤー1の残り時間:{mode.times[0]}</p>
                         <p className='time'>プレイヤー2の残り時間:{mode.times[1]}</p>
                         <button onClick={() => setModeWrapper("start")}>タイトルに戻る</button>
