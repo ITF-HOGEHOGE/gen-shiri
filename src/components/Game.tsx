@@ -9,8 +9,8 @@ function Game (props: {
     wordLength: [number, number],
     setModeWrapper: SetModeWrapper
 }) {
-    const [usedWords,setUsedWords] = useState<Set<string>>(new Set());
-    const [isPaused,setIsPaused] = useState(false);
+    const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
+    const [isPaused, setIsPaused] = useState(false);
     // 次のターンに進む
     const passTurn = () => {
         playerRefs[turn.current].current?.endTurn();
@@ -37,13 +37,12 @@ function Game (props: {
     const setModeResult = () => {
         props.setModeWrapper("result", [playerRefs[0].current!.getTime(), playerRefs[1].current!.getTime()]);
     };
-
+    // ゲームを一時停止
     const pauseGame = () => {
-        playerRefs[0].current?.endTurn();
-        playerRefs[1].current?.endTurn();
+        playerRefs[turn.current].current?.endTurn();
         setIsPaused(true);
     }
-
+    // ゲームを再開
     const resumeGame = () => {
         playerRefs[turn.current].current?.startTurn();
         setIsPaused(false);

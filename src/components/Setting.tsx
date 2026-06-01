@@ -16,34 +16,34 @@ function Settings(props: {
             <div>
                 プレイヤー1の持ち時間(秒)
                 <input
-                type='number'
-                value={inputTime1}
-                onChange={(e) => setInputTime1(e.target.value)}
-            />
+                    type='number'
+                    value={inputTime1}
+                    onChange={(e) => setInputTime1(e.target.value)}
+                />
             </div>
             <div>
                 プレイヤー2の持ち時間(秒)
                 <input
-                type='number'
-                value={inputTime2}
-                onChange={(e) => setInputTime2(e.target.value)}
-            />
+                    type='number'
+                    value={inputTime2}
+                    onChange={(e) => setInputTime2(e.target.value)}
+                />
             </div>
             <div>
                 最小の文字数(2以上)
                 <input
-                type='number'
-                value={inputMinWordLength}
-                onChange={(e) => setInputMinWordLength(e.target.value)}
-            />
+                    type='number'
+                    value={inputMinWordLength}
+                    onChange={(e) => setInputMinWordLength(e.target.value)}
+                />
             </div>
             <div>
                 最大の文字数(2以上)
                 <input
-                type='number'
-                value={inputMaxWordLength}
-                onChange={(e) => setInputMaxWordLength(e.target.value)}
-            />
+                    type='number'
+                    value={inputMaxWordLength}
+                    onChange={(e) => setInputMaxWordLength(e.target.value)}
+                />
             </div>
             <p>プレイヤー1とプレイヤー2を決めたら、スタートを押してください</p>
             <button

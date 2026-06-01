@@ -14,9 +14,9 @@ function Input(props: {
     }
 
     function getNextHead(word:string) {
-        let last = word[word.length-1];
+        let last: string = word[word.length - 1];
         if (last === 'ー') {
-            last = word[word.length-2];
+            last = word[word.length - 2];
         }
         const smallToLarge: Record<string,string> = {
             "ぁ": "あ",
@@ -29,7 +29,7 @@ function Input(props: {
             "ょ": "よ",
             "っ": "つ",
             "ゎ": "わ",
-        }
+        };
         return smallToLarge[last] ?? last;
     }
 
@@ -37,6 +37,7 @@ function Input(props: {
         const url: string = `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
         const res = await fetch(url);
         const data = await res.json();
+        // any型許すまじ
         return data[1].length > 0;
     }
 
@@ -52,9 +53,9 @@ function Input(props: {
                 alert(`${requestLen}文字以上の言葉を入力してください`);
                 return;
             }
-        }else{
+        } else {
             if (input.length !== requestLen) {
-                alert(`${requestLen}文字以上の言葉を入力してください`);
+                alert(`${requestLen}文字の言葉を入力してください`);
                 return;
             }
         }
@@ -63,6 +64,7 @@ function Input(props: {
             alert(`${requestHead}から始まる言葉を入力してください。`);
             return;
         }
+        // 使用済みチェック
         if (props.usedWords.has(input)) {
             alert('その言葉は既に使われています')
             return;
@@ -78,18 +80,20 @@ function Input(props: {
                 return;
             }
         }
+        // 次の頭文字
         const nextHead = getNextHead(input);
         if (nextHead === 'ん'){
             alert('「ん」で終わっています')
             return;
         }
+        // 使用済み単語を更新
         props.setUsedWords((prev) => {
             const next = new Set(prev);
             next.add(input);
             return next;
-        })
-        setRequestHead(nextHead)
-        setRequestLen(getRandomLength())
+        });
+        setRequestHead(nextHead);
+        setRequestLen(getRandomLength());
         clearInput();
         props.passTurn();
     };
@@ -135,11 +139,12 @@ function Input(props: {
     // ひらがなのみからなるか、検査する正規表現
     const hiraganaRegex = /^\p{scx=Hiragana}+$/u;
 
+    // 入力欄が空になったとき、ひらがな欄も空にする
     useEffect(() => {
         if (inputText.length === 0) {
             setInputTextHiragana("");
         }
-    }, [inputText])
+    }, [inputText]);
 
     return (
         <>

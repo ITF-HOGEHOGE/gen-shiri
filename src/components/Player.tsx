@@ -29,6 +29,7 @@ const Player = forwardRef((props: {
         return time;
     };
     
+    // 親でこれらの関数を使えるように
     useImperativeHandle(ref, () => ({startTurn, endTurn, getTime}));
     // 残り時間が0なら結果画面へ
     useEffect(() => {
