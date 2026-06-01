@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef ,useState } from "react";
 import { PlayerRef } from "./index";
 import Player from "./Player";
 import Input from "./Input";
@@ -9,6 +9,7 @@ function Game (props: {
     wordLength: [number, number],
     setModeWrapper: SetModeWrapper
 }) {
+    const [usedWords,setUsedWords] = useState<Set<string>>(new Set());
     // 次のターンに進む
     const passTurn = () => {
         playerRefs[turn.current].current?.endTurn();
@@ -56,7 +57,12 @@ function Game (props: {
                 />
             </div>
             <p>プレイヤー{turn.current + 1}の番です。</p>
-            <Input passTurn={passTurn} wordLength={props.wordLength}/>
+            <Input 
+                passTurn={passTurn} 
+                wordLength={props.wordLength}
+                usedWords={usedWords}
+                setUsedWords={setUsedWords}
+            />
             <button type="button" onClick={() => props.setModeWrapper("start")}>中断する</button>
         </div>
     )
