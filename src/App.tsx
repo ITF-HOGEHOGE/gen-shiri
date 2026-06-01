@@ -3,7 +3,7 @@ import { Mode } from '.';
 import Game from "./components/Game"
 
 function App() {
-    const [mode, setMode] = useState<Mode>("start");
+    const [mode, setMode] = useState<Mode>({mode: "start"});
 
     const [answer,setAnswer] = useState('');
 
@@ -36,11 +36,11 @@ function App() {
         <div className='app'>
             <h1>限界しりとり</h1>
             {
-                mode == "start" 
+                mode.mode == "start" 
                 ?   (<div>
-                        <button onClick={() => setMode("setting")}>ゲームを始める</button>
+                        <button onClick={() => setMode({mode: "setting"})}>ゲームを始める</button>
                     </div>)
-                :   mode == "setting"
+                :   mode.mode == "setting"
                 ?   (<div>
                         <p>ルールを決めてください。</p>
                         <input
@@ -90,22 +90,22 @@ function App() {
                                     alert('最小文字数は最大文字数以下にしてください');
                                     return;
                                 }
-                                setMode("game");
+                                setMode({mode: "game"});
                             }}
                         >スタート</button>
                     </div>)
-                :   mode == "result"
+                :   mode.mode == "result"
                 ?   (<div className='result-card'>
                         <h2>時間切れ・・・</h2>
                         <p className='winner'>結果 プレイヤー1の勝ち!</p>
-                        <p className='time'>プレイヤー1の残り時間:</p>
-                        <p className='time'>プレイヤー2の残り時間:</p>
-                        <button onClick={() => setMode("start")}>タイトルに戻る</button>
+                        <p className='time'>プレイヤー1の残り時間:{mode.times[0]}</p>
+                        <p className='time'>プレイヤー2の残り時間:{mode.times[1]}</p>
+                        <button onClick={() => setMode({mode: "start"})}>タイトルに戻る</button>
                     </div>)
                 :   <Game 
                         times={[Number(inputTime1), Number(inputTime2)]} 
                         wordLength={[Number(minWordLength),Number(maxWordLength)]} 
-                        setModeStart={() => setMode("start")} 
+                        setMode={(mode: Mode) => setMode(mode)}
                     />
             }
         </div>

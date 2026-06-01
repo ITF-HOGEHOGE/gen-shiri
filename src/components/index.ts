@@ -5,5 +5,6 @@ export type PlayerData = {
 
 export type PlayerRef = {
     startTurn: () => void,
-    endTurn: () => void
+    endTurn: () => void,
+    getTime: () => number
 };

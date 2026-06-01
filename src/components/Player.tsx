@@ -1,8 +1,9 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { PlayerData } from ".";
 
 const Player = forwardRef((props: {
-    playerData: PlayerData
+    playerData: PlayerData,
+    setModeResult: () => void
 }, ref) => {
     const [time, setTime] = useState<number>(props.playerData.time);
     const intervalId = useRef<number | null>(null);
@@ -19,8 +20,17 @@ const Player = forwardRef((props: {
             intervalId.current = null;
         }
     };
+    const getTime = () => {
+        return time;
+    };
     
-    useImperativeHandle(ref, () => ({startTurn, endTurn}));
+    useImperativeHandle(ref, () => ({startTurn, endTurn, getTime}));
+    useEffect(() => {
+        if (time === 0) {
+            endTurn();
+            props.setModeResult();
+        }
+    }, [time]);
 
     return (
         <div>プレイヤー{props.playerData.id} 残り{time}秒</div>
