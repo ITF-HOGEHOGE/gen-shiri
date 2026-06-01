@@ -36,8 +36,8 @@ function Settings(props: {
             <button
                 onClick={() => {
                     const inputs: [SettingValues, SettingValues] = useHandicap
-                        ?   [playerSettingsRefs[0].current!.getInput(), playerSettingsRefs[0].current!.getInput()]
-                        :   [playerSettingsRefs[0].current!.getInput(), playerSettingsRefs[1].current!.getInput()];
+                        ?   [playerSettingsRefs[0].current!.getInput(), playerSettingsRefs[1].current!.getInput()]
+                        :   [playerSettingsRefs[0].current!.getInput(), playerSettingsRefs[0].current!.getInput()];
                     for (const input of inputs) {
                         if (!input.time || !input.wordLength.min || !input.wordLength.max) {
                             alert('項目に空欄があります');
