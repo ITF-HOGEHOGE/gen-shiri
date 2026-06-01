@@ -9,7 +9,7 @@ function App() {
 
     // modeを更新する関数
     // オーバーロードされており、引数のパターンを３つ持つ
-    const setModeWrapper: SetModeWrapper = (modeName, times?: [number, number], wordLength?: [number, number]) => {
+    const setModeWrapper: SetModeWrapper = (modeName, times?: [number, number], wordLength1?: [number, number], wordLength2?: [number, number]) => {
         if (modeName === "result") {
             setMode({
                 mode: "result",
@@ -19,7 +19,8 @@ function App() {
             setMode({
                 mode: "game",
                 times: times === undefined ? [0, 0] : times,
-                wordLength: wordLength === undefined ? [2, 11] : wordLength
+                wordLength1: wordLength1 ?? [2, 11] ,
+                wordLength2: wordLength2 ?? [2, 11]
             })
         } else {
             setMode({
@@ -68,7 +69,8 @@ function App() {
                 :   mode.mode === "game"
                 ?   <Game 
                         times={mode.times} 
-                        wordLength={mode.wordLength} 
+                        wordLength1={mode.wordLength1}
+                        wordLength2={mode.wordLength2} 
                         setModeWrapper={setModeWrapper}
                     />
                 :   <></>

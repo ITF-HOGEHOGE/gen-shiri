@@ -7,22 +7,23 @@ import "./Game.css";
 
 function Game (props: {
     times: [number, number],
-    wordLength: [number, number],
+    wordLength1: [number, number],
+    wordLength2:[number,number],
     setModeWrapper: SetModeWrapper
 }) {
     const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
     const [isPaused, setIsPaused] = useState(false);
     // 次のターンに進む
     const passTurn = () => {
-        playerRefs[turn.current].current?.endTurn();
+        playerRefs[turn].current?.endTurn();
         switchTurn();
-        playerRefs[turn.current].current?.startTurn();
+        playerRefs[turn].current?.startTurn();
     };
     // 今のターンを{0, 1}で保持
-    const turn = useRef<number>(0);
+    const [turn, setTurn] = useState<number>(0);
     // turnを切り替える
     const switchTurn = () => {
-        turn.current = 1 - turn.current;
+        setTurn((pre) => 1 - pre);
     };
     // Playerの関数管理
     const playerRefs = [
@@ -40,12 +41,12 @@ function Game (props: {
     };
     // ゲームを一時停止
     const pauseGame = () => {
-        playerRefs[turn.current].current?.endTurn();
+        playerRefs[turn].current?.endTurn();
         setIsPaused(true);
     }
     // ゲームを再開
     const resumeGame = () => {
-        playerRefs[turn.current].current?.startTurn();
+        playerRefs[turn].current?.startTurn();
         setIsPaused(false);
     }
 
@@ -69,12 +70,14 @@ function Game (props: {
                     ref={playerRefs[1]}
                 />
             </div>
-            <p>プレイヤー{turn.current + 1}の番です。</p>
+            <p>プレイヤー{turn + 1}の番です。</p>
             <Input 
                 passTurn={passTurn} 
-                wordLength={props.wordLength}
+                wordLength1={props.wordLength1}
+                wordLength2={props.wordLength2}
                 usedWords={usedWords}
                 setUsedWords={setUsedWords}
+                turn={turn}
             />
             <button
                 onClick = {() => {
