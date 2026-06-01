@@ -2,15 +2,22 @@ import { useEffect, useState } from "react";
 
 function Input(props: {
     passTurn: () => void,
-    wordLength:[number, number]
+    wordLength1:[number, number]
+    wordLength2:[number,number]
     usedWords:Set<string>,
     setUsedWords: React.Dispatch<
         React.SetStateAction<Set<string>>
     >
+    turn:number
 }) {
-    function getRandomLength() {
-        const [min, max] = props.wordLength;
-        return Math.floor(Math.random() * (max - min + 1)) + min
+    function getRandomLength(turn: number) {
+        if (turn === 0){
+            const [min, max] = props.wordLength1;
+            return Math.floor(Math.random() * (max - min + 1)) + min
+        }else{
+            const [min, max] = props.wordLength2;
+            return Math.floor(Math.random() * (max - min + 1)) + min
+        }
     }
 
     function getNextHead(word:string) {
@@ -41,21 +48,35 @@ function Input(props: {
     }
 
     // 要求する文字列の長さ
-    const [requestLen, setRequestLen] = useState<number>(getRandomLength());
+    const [requestLen, setRequestLen] = useState<number>(getRandomLength(0));
     // 要求する文字列の頭文字
     const [requestHead, setRequestHead] = useState<string>("り");
     // 入力が適切か判定
     const checkInput = async (input: string) => {
         // 文字列の長さチェック
-        if (requestLen === props.wordLength[1]) {
-            if (input.length < requestLen) {
-                alert(`${requestLen}文字以上の言葉を入力してください`);
-                return;
+        if (props.turn === 0){
+            if (requestLen === props.wordLength1[1]) {
+                if (input.length < requestLen) {
+                    alert(`${requestLen}文字以上の言葉を入力してください`);
+                    return;
+                }
+            }else{
+                if (input.length !== requestLen) {
+                    alert(`${requestLen}文字の言葉を入力してください`);
+                    return;
+                }
             }
         }else{
-            if (input.length !== requestLen) {
-                alert(`${requestLen}文字以上の言葉を入力してください`);
-                return;
+            if (requestLen === props.wordLength2[1]) {
+                if (input.length < requestLen) {
+                    alert(`${requestLen}文字以上の言葉を入力してください`);
+                    return;
+                }
+            }else{
+                if (input.length !== requestLen) {
+                    alert(`${requestLen}文字の言葉を入力してください`);
+                    return;
+                }
             }
         }
         // 頭文字チェック
@@ -89,7 +110,7 @@ function Input(props: {
             return next;
         })
         setRequestHead(nextHead)
-        setRequestLen(getRandomLength())
+        setRequestLen(getRandomLength(1 - props.turn))
         clearInput();
         props.passTurn();
     };
@@ -143,7 +164,11 @@ function Input(props: {
 
     return (
         <>
-            <p>文字数: {requestLen === props.wordLength[1] ? `${requestLen}文字以上` : `${requestLen}文字`}</p>
+            <p>文字数: {props.turn === 0 ? (
+                requestLen === props.wordLength1[1] ? `${requestLen}文字以上` : `${requestLen}文字`
+            ):(
+                requestLen === props.wordLength2[1] ? `${requestLen}文字以上` : `${requestLen}文字`
+            )}</p>
             <p>最初の文字: {requestHead}</p>
             <div>
                 <p>ひらがな表示です。</p>
