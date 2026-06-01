@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Mode, SetModeWrapper } from '.';
 import Game from "./components/Game"
-import Setting from "./components/Setting"
+import Setting from "./components/settings/Setting"
+import { SettingValues } from './components/settings';
 
 function App() {
     // アプリがどの状態にあるかを保持
@@ -9,18 +10,31 @@ function App() {
 
     // modeを更新する関数
     // オーバーロードされており、引数のパターンを３つ持つ
-    const setModeWrapper: SetModeWrapper = (modeName, times?: [number, number], wordLength1?: [number, number], wordLength2?: [number, number]) => {
+    const setModeWrapper: SetModeWrapper = (modeName, options?: {times?: [number, number], settings?: [SettingValues, SettingValues]}) => {
         if (modeName === "result") {
             setMode({
                 mode: "result",
-                times: times === undefined ? [0, 0] : times
+                times: options?.times ?? [0, 0]
             });
         } else if (modeName === "game") {
             setMode({
                 mode: "game",
-                times: times === undefined ? [0, 0] : times,
-                wordLength1: wordLength1 ?? [2, 11] ,
-                wordLength2: wordLength2 ?? [2, 11]
+                settings: options?.settings ?? [
+                    {
+                        time: 300,
+                        wordLength: {
+                            min: 2,
+                            max: 8
+                        }
+                    },
+                    {
+                        time: 300,
+                        wordLength: {
+                            min: 2,
+                            max: 8
+                        }
+                    }
+                ]
             })
         } else {
             setMode({
@@ -28,25 +42,6 @@ function App() {
             });
         }
     };
-
-    // const [answer, setAnswer] = useState('');    
-    // async function checkWord(word: string) {
-    //     // wikipediaの存在を判定する
-    //     const url: string = `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
-    //     const res = await fetch(url);
-    //     const data = await res.json();
-
-    //     return data[1].length > 0;
-    // }
-    // async function judgeWord(){
-    //     const exists = await checkWord(answer);
-
-    //     if (exists) {
-    //         alert('有効な単語です');
-    //     }else{
-    //         alert('その単語は見つかりません');
-    //     }
-    // }
 
     return (
         <div className='app'>
@@ -68,9 +63,7 @@ function App() {
                     </div>
                 :   mode.mode === "game"
                 ?   <Game 
-                        times={mode.times} 
-                        wordLength1={mode.wordLength1}
-                        wordLength2={mode.wordLength2} 
+                        settings={mode.settings} 
                         setModeWrapper={setModeWrapper}
                     />
                 :   <></>

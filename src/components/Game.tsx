@@ -4,11 +4,10 @@ import { SetModeWrapper } from "..";
 import Player from "./Player";
 import Input from "./Input";
 import "./Game.css";
+import { SettingValues } from "./settings";
 
 function Game (props: {
-    times: [number, number],
-    wordLength1: [number, number],
-    wordLength2:[number,number],
+    settings: [SettingValues, SettingValues]
     setModeWrapper: SetModeWrapper
 }) {
     const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
@@ -33,11 +32,11 @@ function Game (props: {
     // indexからPlayerのpropsに渡すデータを生成
     const genPlayerData = (index: number) => ({
         id: index + 1,
-        time: props.times[index]
+        time: props.settings[index].time
     });
     // 結果画面に遷移
     const setModeResult = () => {
-        props.setModeWrapper("result", [playerRefs[0].current!.getTime(), playerRefs[1].current!.getTime()]);
+        props.setModeWrapper("result", { times: [playerRefs[0].current!.getTime(), playerRefs[1].current!.getTime()] });
     };
     // ゲームを一時停止
     const pauseGame = () => {
@@ -73,8 +72,7 @@ function Game (props: {
             <p>プレイヤー{turn + 1}の番です。</p>
             <Input 
                 passTurn={passTurn} 
-                wordLength1={props.wordLength1}
-                wordLength2={props.wordLength2}
+                wordLength={[props.settings[0].wordLength, props.settings[1].wordLength]}
                 usedWords={usedWords}
                 setUsedWords={setUsedWords}
                 turn={turn}
