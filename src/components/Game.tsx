@@ -16,8 +16,8 @@ function Game (props: {
     // 次のターンに進む
     const passTurn = () => {
         playerRefs[turn].current?.endTurn();
+        playerRefs[1 - turn].current?.startTurn();
         switchTurn();
-        playerRefs[turn].current?.startTurn();
     };
     // 今のターンを{0, 1}で保持
     const [turn, setTurn] = useState<number>(0);
