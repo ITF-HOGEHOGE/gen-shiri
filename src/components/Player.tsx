@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { PlayerData } from ".";
+import "./Player.css"
 
 const Player = forwardRef((props: {
     playerData: PlayerData,
@@ -40,7 +41,12 @@ const Player = forwardRef((props: {
     }, [time]);
 
     return (
-        <div>プレイヤー{props.playerData.id} 残り{time}秒</div>
+        <div className={"player-player" + (intervalId.current === null ? "" : " player-turn-player")}>
+            <p className="player-player-name">プレイヤー{props.playerData.id}</p>
+            <div className="player-timer-container">
+                残り<div className="player-timer">{time}</div>秒
+            </div>
+        </div>
     )
 });
 

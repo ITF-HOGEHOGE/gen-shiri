@@ -1,0 +1,7 @@
+.game-player-container {
+    display: flex;
+}
+
+.game-empty {
+    width: 50px;
+}

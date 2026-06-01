@@ -1,8 +1,9 @@
 import { useEffect, useRef ,useState } from "react";
 import { PlayerRef } from "./index";
+import { SetModeWrapper } from "..";
 import Player from "./Player";
 import Input from "./Input";
-import { SetModeWrapper } from "..";
+import "./Game.css";
 
 function Game (props: {
     times: [number, number],
@@ -55,12 +56,13 @@ function Game (props: {
 
     return(
         <div>
-            <div>
+            <div className="game-player-container">
                 <Player 
                     playerData={genPlayerData(0)}
                     setModeResult={setModeResult}
                     ref={playerRefs[0]}
                 />
+                <div className="game-empty" />
                 <Player
                     playerData={genPlayerData(1)}
                     setModeResult={setModeResult}
