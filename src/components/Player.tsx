@@ -5,6 +5,7 @@ import "./Player.css"
 const Player = forwardRef((props: {
     playerData: PlayerData,
     setModeResult: () => void
+    numList:number[][]
 }, ref) => {
     // 残り時間
     const [time, setTime] = useState<number>(props.playerData.time);
@@ -45,6 +46,9 @@ const Player = forwardRef((props: {
             <p className="player-player-name">プレイヤー{props.playerData.id}</p>
             <div className="player-timer-container">
                 残り<div className="player-timer">{time}</div>秒
+            </div>
+            <div>
+                今までに引いた数:{[props.numList[props.playerData.id-1]].join(',')}
             </div>
         </div>
     )

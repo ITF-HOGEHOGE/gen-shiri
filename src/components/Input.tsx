@@ -14,19 +14,18 @@ function Input(props: {
         pass: boolean;
         lengthDown: boolean;
     }
+    requestLen:number
+    addLength:number[]
+    setRequestLen:React.Dispatch<React.SetStateAction<number>>
+    setAddLength: React.Dispatch<React.SetStateAction<number[]>>
+    getRandomLength(turn: number): number
+    numList:number[][]
+    setNumList:React.Dispatch<React.SetStateAction<number[][]>>
 }) {
     // 使用済みの言葉
     const usedWords = useRef<Set<string>>(new Set());
-    //文字数減らしで増える文字数
-    const [addLength,setAddLength] = useState([0,0])
+    
 
-    // 要求する文字列の長さ
-    const [requestLen, setRequestLen] = useState<number>(getRandomLength(0));
-    // 次の言葉の長さをランダムに決定
-    function getRandomLength(turn: number) {
-        const { min, max } = props.wordLength[turn];
-        return Math.floor(Math.random() * (max - min + 1)) + min + addLength[turn];
-    }
 
     // 要求する文字列の頭文字
     const [requestHead, setRequestHead] = useState<string>("り");
@@ -89,19 +88,19 @@ function Input(props: {
                 if (hiraganaInput.length < 2){
                     alert('2文字以上の言葉を入力して下さい')
                     return;
-                }else if(hiraganaInput.length >= requestLen) {
+                }else if(hiraganaInput.length >= props.requestLen) {
                     alert('文字数を減らすことができません')
                     return;
                 }
         }else{
             // 文字列の長さチェック
-            if (requestLen === props.wordLength[props.turn].max + addLength[props.turn]) {
-                if (hiraganaInput.length < requestLen) {
-                    alert(`${requestLen}文字以上の言葉を入力してください`);
+            if (props.requestLen === props.wordLength[props.turn].max + props.addLength[props.turn]) {
+                if (hiraganaInput.length < props.requestLen) {
+                    alert(`${props.requestLen}文字以上の言葉を入力してください`);
                     return;}
             }else{
-                if (hiraganaInput.length !== requestLen) {
-                    alert(`${requestLen}文字の言葉を入力してください`);
+                if (hiraganaInput.length !== props.requestLen) {
+                    alert(`${props.requestLen}文字の言葉を入力してください`);
                     return;
                 }
             }
@@ -147,14 +146,21 @@ function Input(props: {
         }
         props.setUseLengthDown(false)
         props.setUseNmawashi(false)
+        
+        //引いた数のリストを更新
+        const card = props.getRandomLength(1-props.turn) - props.addLength[1-props.turn]
+        props.setRequestLen(card+props.addLength[1-props.turn])
+        const newList = [[...props.numList[0]],[...props.numList[1]]] 
+        newList[1-props.turn].push(card)
+        props.setNumList(newList)
+
         //ん回しで次に追加する文字数を更新
-        setAddLength(prev => {
+        props.setAddLength(prev => {
             const next = [...prev];
-            next[props.turn] = requestLen - hiraganaInput.length
+            next[props.turn] = props.requestLen - hiraganaInput.length
             return next;
         })
         setRequestHead(nextHead)
-        setRequestLen(getRandomLength(1 - props.turn))
         clearInput();
         props.passTurn();
     };
@@ -243,9 +249,9 @@ function Input(props: {
         <>
             <p>
                 文字数:
-                {requestLen === props.wordLength[props.turn].max + addLength[props.turn]
-                    ? `${requestLen-addLength[props.turn]}${addLength[props.turn] ? `+${addLength[props.turn]}` : ""}文字以上`
-                    : `${requestLen-addLength[props.turn]}${addLength[props.turn] ? `+${addLength[props.turn]}` : ""}文字`
+                {props.requestLen === props.wordLength[props.turn].max + props.addLength[props.turn]
+                    ? `${props.requestLen-props.addLength[props.turn]}${props.addLength[props.turn] ? `+${props.addLength[props.turn]}` : ""}文字以上`
+                    : `${props.requestLen-props.addLength[props.turn]}${props.addLength[props.turn] ? `+${props.addLength[props.turn]}` : ""}文字`
                 }
             </p>
             <p>最初の文字: {requestHead}</p>
