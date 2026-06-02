@@ -49,6 +49,7 @@ function Game (props: {
 
     //文字数減らしで増える文字数
     const [addLength,setAddLength] = useState([0,0])
+    console.log(addLength)
 
     // 次の言葉の長さをランダムに決定
     function getRandomLength(turn: number) {

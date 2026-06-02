@@ -76,7 +76,7 @@ function Input(props: {
         const res = await fetch(url);
         const data = await res.json();
         if (responseJsonCheck(data)) {
-            return data[1].length > 0;
+            return data[1].length > 0 && data[1][0] === word;
         } else {
             console.log("API TYPE ERROR");
             return false;
@@ -146,7 +146,7 @@ function Input(props: {
         }
         props.setUseLengthDown(false)
         props.setUseNmawashi(false)
-        
+
         //引いた数のリストを更新
         const card = props.getRandomLength(1-props.turn) - props.addLength[1-props.turn]
         props.setRequestLen(card+props.addLength[1-props.turn])
@@ -157,7 +157,7 @@ function Input(props: {
         //ん回しで次に追加する文字数を更新
         props.setAddLength(prev => {
             const next = [...prev];
-            next[props.turn] = props.requestLen - hiraganaInput.length
+            next[props.turn] = Math.max(props.requestLen - hiraganaInput.length,0)
             return next;
         })
         setRequestHead(nextHead)
