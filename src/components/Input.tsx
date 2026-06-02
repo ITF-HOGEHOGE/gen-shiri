@@ -41,13 +41,30 @@ function Input(props: {
         return smallToLarge[last] ?? last;
     }
 
+    const responseJsonCheck = (data: any): data is [string, string[], any, any] => {
+        if (
+            Array.isArray(data) 
+            && data.length === 4 
+            && typeof data[0] === "string" 
+            && Array.isArray(data[1])
+            && data[1].every((v) => typeof v === "string")
+        ) {
+            return true
+        } else {
+            return false
+        }
+    }
     // 存在する言葉かどうか判定
     async function checkWord(word: string) {
         const url: string = `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
         const res = await fetch(url);
         const data = await res.json();
-        // !TODO: any型許すまじ
-        return data[1].length > 0;
+        if (responseJsonCheck(data)) {
+            return data[1].length > 0;
+        } else {
+            console.log("API TYPE ERROR");
+            return false;
+        }
     }
     // 入力が適切か判定
     const checkInput = async (input: string, hiraganaInput: string) => {
