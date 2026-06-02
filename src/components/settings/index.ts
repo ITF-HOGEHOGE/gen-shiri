@@ -5,13 +5,23 @@ export type WordLength = {
 
 export type SettingValues = {
     time: number,
-    wordLength: WordLength
+    wordLength: WordLength,
+    lifeline: {
+        nmawashi: boolean;
+        pass: boolean;
+        lengthDown: boolean;
+    }
 };
-export const defaultSettingValues = {
+export const defaultSettingValues: SettingValues = {
     time: 300,
     wordLength: {
         min: 2,
         max: 8
+    },
+    lifeline: {
+        nmawashi: true,
+        pass: true,
+        lengthDown: true,
     }
 };
 

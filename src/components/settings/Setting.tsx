@@ -42,7 +42,15 @@ function Settings(props: {
         // モード遷移
         const settings: [SettingValues, SettingValues] = useHandicap
             ? [inputs[0], inputs[1]]
-            : [inputs[0], inputs[0]];
+            : [{
+                time: inputs[0].time,
+                wordLength: inputs[0].wordLength,
+                lifeline: {...inputs[0].lifeline},
+            }, {
+                time: inputs[0].time,
+                wordLength: inputs[0].wordLength,
+                lifeline: {...inputs[0].lifeline},
+            }];
         props.setModeWrapper(
             "game", 
             { settings }

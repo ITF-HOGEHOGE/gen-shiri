@@ -5,6 +5,7 @@ import Player from "./Player";
 import Input from "./Input";
 import "./Game.css";
 import { SettingValues } from "./settings";
+import Settings from "./settings/Setting";
 
 function Game (props: {
     settings: [SettingValues, SettingValues]
@@ -41,6 +42,11 @@ function Game (props: {
         playerRefs[turn].current?.endTurn();
         setIsPaused(true);
     };
+
+    //ライフラインをこのターンで使用中か
+    const [useNmawashi,setUseNmawashi] = useState(false);
+    const [useLengthDown,setUseLengthDown] = useState(false);
+
     // ゲームを再開
     const resumeGame = () => {
         playerRefs[turn].current?.startTurn();
@@ -80,14 +86,56 @@ function Game (props: {
                 />
             </div>
             <p>プレイヤー{turn + 1}の番です。</p>
+            <div>
+                使えるライフライン
+                {props.settings[turn].lifeline.pass ? (
+                    <button onClick={() => {
+                        props.settings[turn].lifeline.pass = false
+                        passTurn()
+                    }
+                    }>パス</button>
+                ):(
+                    <></>
+                )}
+                {props.settings[turn].lifeline.nmawashi ? (
+                    <label>
+                        <input
+                            type='checkbox'
+                            checked={useNmawashi}
+                            onChange={(e) => setUseNmawashi(e.target.checked)}
+                        />
+                        ん回し
+                    </label>
+                ):(
+                    <></>
+                )}
+                {props.settings[turn].lifeline.lengthDown ? (
+                    <label>
+                        <input
+                            type='checkbox'
+                            checked={useLengthDown}
+                            onChange={(e) => setUseLengthDown(e.target.checked)}
+                        />
+                        文字数減らし
+                    </label>
+                ):(
+                    <></>
+                )}
+            </div>
             <Input 
-                passTurn={passTurn} 
+                passTurn={passTurn}
+                useNmawashi={useNmawashi}
+                useLengthDown={useLengthDown} 
                 wordLength={[props.settings[0].wordLength, props.settings[1].wordLength]}
                 turn={turn}
+                lifeline={props.settings[turn].lifeline}
+                setUseLengthDown={setUseLengthDown}
+                setUseNmawashi={setUseNmawashi}
             />
             <button onClick={switchPaused}>
                 {isPaused ? '再開' : '一時停止'}
             </button>
+            {}
             <button type="button" onClick={() => props.setModeWrapper("start")}>ゲームをやめる</button>
         </div>
     )
