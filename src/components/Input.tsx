@@ -1,25 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { WordLength } from "./settings";
 
 function Input(props: {
     passTurn: () => void,
     wordLength: [WordLength, WordLength],
-    usedWords:Set<string>,
-    setUsedWords: React.Dispatch<
-        React.SetStateAction<Set<string>>
-    >
-    turn:number
+    turn: number
 }) {
+    // 使用済みの言葉
+    const usedWords = useRef<Set<string>>(new Set());
+
+
+    // 要求する文字列の長さ
+    const [requestLen, setRequestLen] = useState<number>(getRandomLength(0));
+    // 次の言葉の長さをランダムに決定
     function getRandomLength(turn: number) {
-        if (turn === 0){
-            const { min, max } = props.wordLength[0];
-            return Math.floor(Math.random() * (max - min + 1)) + min
-        }else{
-            const { min, max } = props.wordLength[1];
-            return Math.floor(Math.random() * (max - min + 1)) + min
-        }
+        const { min, max } = props.wordLength[turn];
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    // 要求する文字列の頭文字
+    const [requestHead, setRequestHead] = useState<string>("り");
+    // 次の言葉の頭文字を決定
     function getNextHead(word:string) {
         let last: string = word[word.length - 1];
         if (last === 'ー') {
@@ -40,118 +41,142 @@ function Input(props: {
         return smallToLarge[last] ?? last;
     }
 
+    // 存在する言葉かどうか判定
     async function checkWord(word: string) {
         const url: string = `https://ja.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(word)}&limit=1&namespace=0&format=json&origin=*`;
         const res = await fetch(url);
         const data = await res.json();
-        // any型許すまじ
+        // !TODO: any型許すまじ
         return data[1].length > 0;
     }
-
-    // 要求する文字列の長さ
-    const [requestLen, setRequestLen] = useState<number>(getRandomLength(0));
-    // 要求する文字列の頭文字
-    const [requestHead, setRequestHead] = useState<string>("り");
     // 入力が適切か判定
-    const checkInput = async (input: string) => {
+    const checkInput = async (input: string, hiraganaInput: string) => {
         // 文字列の長さチェック
         if (requestLen === props.wordLength[props.turn].max) {
-            if (input.length < requestLen) {
+            if (hiraganaInput.length < requestLen) {
                 alert(`${requestLen}文字以上の言葉を入力してください`);
                 return;
             }
         }else{
-            if (input.length !== requestLen) {
+            if (hiraganaInput.length !== requestLen) {
                 alert(`${requestLen}文字の言葉を入力してください`);
                 return;
             }
         }
         // 頭文字チェック
-        if (input[0] !== requestHead) {
+        if (hiraganaInput[0] !== requestHead) {
             alert(`${requestHead}から始まる言葉を入力してください。`);
             return;
         }
         // 使用済みチェック
-        if (props.usedWords.has(input)) {
+        if (usedWords.current.has(hiraganaInput)) {
             alert('その言葉は既に使われています')
             return;
         }
         // 存在チェック
-        const convertedWord = inputText + inputTextTmp;
-        const exists = await checkWord(convertedWord);
+        const exists = await checkWord(input);
         if (!exists) {
             const approved = window.confirm(
-                `「${convertedWord}」は見つかりませんでした。\n両者合意の下で有効な単語として認めますか？`
+                `「${input}」は見つかりませんでした。\n両者合意の下で有効な単語として認めますか？`
             );
             if (!approved){
                 return;
             }
         }
         // 次の頭文字
-        const nextHead = getNextHead(input);
+        const nextHead = getNextHead(hiraganaInput);
         if (nextHead === 'ん'){
             alert('「ん」で終わっています')
             return;
         }
         // 使用済み単語を更新
-        props.setUsedWords((prev) => {
-            const next = new Set(prev);
-            next.add(input);
-            return next;
-        })
+        usedWords.current.add(hiraganaInput);
         setRequestHead(nextHead)
         setRequestLen(getRandomLength(1 - props.turn))
         clearInput();
         props.passTurn();
     };
+
     // 入力された文字列(確定済み)
-    const [inputText, setInputText] = useState<string>("");
+    const [input, setInput] = useState<string>("");
     // 入力された文字列(変換中)
-    const [inputTextTmp, setInputTextTmp] = useState<string>("");
+    const [inputConverting, setInputConverting] = useState<string>("");
     // 入力された文字列のひらがな(確定済み)
-    const [inputTextHiragana, setInputTextHiragana] = useState<string>("");
+    const [inputHiragana, setInputHiragana] = useState<string>("");
     // 入力された文字列のひらがな(未確定)
-    const [inputTextHiraganaTmp, setInputTextHiraganaTmp] = useState<string>("");
+    const [inputHiraganaConverting, setInputHiraganaConverting] = useState<string>("");
+    // 入力された文字列をすべて取得
+    const getAllInput = () => {
+        return input + inputConverting;
+    };
+    // 入力された文字列のひらがなをすべて取得
+    const getAllInputHiragana = () => {
+        return inputHiragana + inputHiraganaConverting;
+    };
+
     // 入力をクリア
     const clearInput = () => {
-        setInputText("");
-        setInputTextTmp("");
-        setInputTextHiragana("");
-        setInputTextHiraganaTmp("");
+        setInput("");
+        setInputConverting("");
+        setInputHiragana("");
+        setInputHiraganaConverting("");
     };
+    // 変換終了時に実行
+    // 変換完了時と、変換中に対象の文字列をすべて消したときにも実行
+    const onCompositionEnd = () => {
+        if (inputConverting.length > 0) {
+            setInput((pre) => pre + inputConverting);
+            setInputHiragana((pre) => pre + inputHiraganaConverting);
+        }
+        setInputConverting("");
+        setInputHiraganaConverting("");
+    };
+    // ひらがなのみからなるか、検査する正規表現
+    const hiraganaRegex = /^\p{scx=Hiragana}+$/u;
+    // 変換中に実行され、ひらがな表示を更新
+    const updateHiraganaWhileConvering = (e: React.CompositionEvent<HTMLInputElement>) => {
+        if (hiraganaRegex.test(e.data)) {
+            setInputHiraganaConverting(e.data);
+        }
+    };
+
     // 入力が変更されたとき
     const onChange = (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
         // 入力された文字列
         const eventValue: string = e.target.value;
         // 入力はじめのとき
-        if (inputText.length === 0) {
-            setInputTextTmp(eventValue);
+        if (input.length === 0) {
+            setInputConverting(eventValue);
             return;
         }
         // 今持っている文字列(確定済み)とどこまで一致するか判定
         let nowIndex: number = 0;
-        while (inputText[nowIndex] === eventValue[nowIndex]) {
+        while (nowIndex < input.length && input[nowIndex] === eventValue[nowIndex]) {
             nowIndex += 1;
-            // 入力された文字列が、今持っている文字列(確定済み)を含む文字列であったとき
-            if (nowIndex === inputText.length) {
-                // 持っている文字列(未確定)を更新
-                setInputTextTmp(eventValue.slice(nowIndex));
-                return;
-            }
         }
-        // 入力された文字列が、今持っている文字列(確定済み)を含む文字列でなかったとき
-        // 今持っている文字列(確定済み)を更新
-        setInputText(eventValue);
+        // 入力された文字列が、今持っている文字列(確定済み)を含む文字列であったとき
+        if (nowIndex === input.length) {
+            // 持っている文字列(未確定)を更新
+            setInputConverting(eventValue.slice(nowIndex));
+            return;
+        } else {
+            // 入力された文字列が、今持っている文字列(確定済み)を含む文字列でなかったとき
+            // 今持っている文字列(確定済み)を更新
+            setInput(eventValue);
+        }
     };
-    // ひらがなのみからなるか、検査する正規表現
-    const hiraganaRegex = /^\p{scx=Hiragana}+$/u;
 
     // 入力欄が空になったとき、ひらがな欄も空にする
     useEffect(() => {
-        if (inputText.length === 0) {
-            setInputTextHiragana("");
+        if (input.length === 0) {
+            setInputHiragana("");
         }
-    }, [inputText]);
+    }, [input]);
+    useEffect(() => {
+        if (inputConverting.length === 0) {
+            setInputHiraganaConverting("");
+        }
+    }, [inputConverting]);
 
     return (
         <>
@@ -161,30 +186,21 @@ function Input(props: {
                 <p>ひらがな表示です。</p>
                 <input
                     type="text"
-                    value={inputTextHiragana + inputTextHiraganaTmp}
-                    disabled={inputText.length === 0}
+                    value={getAllInputHiragana()}
+                    disabled={input.length === 0}
                     onChange={(e) => {
-                        setInputTextHiragana(e.target.value);
+                        setInputHiragana(e.target.value);
                     }}
                 />
                 <input
                     type='text'
                     placeholder="回答してください"
-                    value={inputText + inputTextTmp}
+                    value={getAllInput()}
                     onChange={onChange}
-                    onCompositionUpdate={(e) => {
-                        if (hiraganaRegex.test(e.data)) {
-                            setInputTextHiraganaTmp(e.data);
-                        }
-                    }}
-                    onCompositionEnd={() => {
-                        setInputText((pre) => pre + inputTextTmp);
-                        setInputTextTmp("");
-                        setInputTextHiragana((pre) => pre + inputTextHiraganaTmp);
-                        setInputTextHiraganaTmp("");
-                    }}
+                    onCompositionUpdate={updateHiraganaWhileConvering}
+                    onCompositionEnd={onCompositionEnd}
                 />
-                <button type="button" onClick={() => checkInput(inputTextHiragana + inputTextHiraganaTmp)}>回答</button>
+                <button type="button" onClick={() => checkInput(getAllInput(), getAllInputHiragana())}>回答</button>
             </div>
         </>
     )

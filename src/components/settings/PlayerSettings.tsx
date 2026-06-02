@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { SettingValues, WordLength } from "./index";
+import { SettingValues } from "./index";
 
 const PlayerSetting = forwardRef((props: {
     playerId?: number

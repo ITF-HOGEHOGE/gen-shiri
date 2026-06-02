@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { SetModeWrapper } from "../../index";
 import PlayerSettings from "./PlayerSettings";
 import { PlayerSettingRef, SettingValues } from ".";
@@ -12,6 +12,42 @@ function Settings(props: {
         useRef<PlayerSettingRef | null>(null),
         useRef<PlayerSettingRef | null>(null)
     ];
+    const startGame = () => {
+        const inputs: SettingValues[] = useHandicap
+            ?   [playerSettingsRefs[0].current!.getInput(), playerSettingsRefs[1].current!.getInput()]
+            :   [playerSettingsRefs[0].current!.getInput()];
+        // 入力を検査
+        for (const input of inputs) {
+            // ずべて入力されているか
+            if (!input.time || !input.wordLength.min || !input.wordLength.max) {
+                alert('項目に空欄があります');
+                return;
+            }
+            // 持ち時間が正の値で入力されているか
+            if (input.time <= 0) {
+                alert('持ち時間は正の数で入力してください');
+                return;
+            }
+            // 文字数が2以上で入力されているか
+            if (input.wordLength.min <= 1 || input.wordLength.max <= 1) {
+                alert('文字数は2以上で入力してください');
+                return;
+            }
+            // 最大文字数のほうが大きいか
+            if (input.wordLength.min > input.wordLength.max) {
+                alert('最小文字数は最大文字数以下にしてください');
+                return;
+            }
+        }
+        // モード遷移
+        const settings: [SettingValues, SettingValues] = useHandicap
+            ? [inputs[0], inputs[1]]
+            : [inputs[0], inputs[0]];
+        props.setModeWrapper(
+            "game", 
+            { settings }
+        );
+    };
 
     return (
         <div>
@@ -33,35 +69,7 @@ function Settings(props: {
                 :   <PlayerSettings ref={playerSettingsRefs[0]} />
             }
             <p>スタートを押すとゲームが始まります</p>
-            <button
-                onClick={() => {
-                    const inputs: [SettingValues, SettingValues] = useHandicap
-                        ?   [playerSettingsRefs[0].current!.getInput(), playerSettingsRefs[1].current!.getInput()]
-                        :   [playerSettingsRefs[0].current!.getInput(), playerSettingsRefs[0].current!.getInput()];
-                    for (const input of inputs) {
-                        if (!input.time || !input.wordLength.min || !input.wordLength.max) {
-                            alert('項目に空欄があります');
-                            return;
-                        }
-                        if (input.time <= 0) {
-                            alert('持ち時間は正の数で入力してください');
-                            return;
-                        }
-                        if (input.wordLength.min <= 1 || input.wordLength.max <= 1) {
-                            alert('文字数は2以上で入力してください');
-                            return;
-                        }
-                        if (input.wordLength.min > input.wordLength.max) {
-                            alert('最小文字数は最大文字数以下にしてください');
-                            return;
-                        }
-                    }
-                    props.setModeWrapper(
-                        "game", 
-                        { settings: inputs }
-                    );
-                }}
-            >スタート</button>
+            <button onClick={startGame}>スタート</button>
         </div>
     )
 }
