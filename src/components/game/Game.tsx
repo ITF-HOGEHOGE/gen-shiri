@@ -16,8 +16,12 @@ function Game (props: {
     const switchTurn = () => {
         setTurn((pre) => 1 - pre);
     };
+    const startTurn = () => {
+        const turnData = playerRefs[0].current!.startTurn();
+        inputRef.current?.setTurnData(turnData);
+    };
     // 次のターンに進む
-    const passTurn = (addLength?: number) => {
+    const endTurn = (addLength?: number) => {
         playerRefs[turn].current?.endTurn(addLength);
         switchTurn();
     };
@@ -35,6 +39,9 @@ function Game (props: {
         useRef<PlayerRef | null>(null)
     ];
 
+    // Inputの関数管理
+    const inputRef = useRef<InputRef | null>(null);
+
     // 一時中断の最中かどうか
     const [isPaused, setIsPaused] = useState(false);
     // ゲームを一時停止
@@ -47,6 +54,7 @@ function Game (props: {
         playerRefs[turn].current?.resumeTurn();
         setIsPaused(false);
     };
+    // 再開/一時停止を切り替え
     const switchPaused = () => {
         if (isPaused) {
             resumeGame();
@@ -60,11 +68,12 @@ function Game (props: {
         props.setModeWrapper("result", { times: [playerRefs[0].current!.getTime(), playerRefs[1].current!.getTime()] });
     };
 
+    // 最初のカウントダウン
     const [startCount, setStartCount] = useState<number>(4);
+    // 最初のカウントダウンをする定期実行
     const countIntervalId = useRef<number | null>(null);
 
-    const inputRef = useRef<InputRef | null>(null);
-
+    // 初回レンダリング時にカウントダウン開始
     useEffect(() => {
         if (countIntervalId.current === null) {
             countIntervalId.current = setInterval(() => {
@@ -72,20 +81,19 @@ function Game (props: {
             }, 1000);
         }
     }, []);
-    // 初回レンダリング時にターン開始
+    // カウントダウン終了時にターン開始
     useEffect(() => {
         if (startCount === -1 && countIntervalId.current !== null) {
             clearInterval(countIntervalId.current);
             countIntervalId.current = null;
-            const turnData = playerRefs[0].current!.startTurn();
-            inputRef.current?.setTurnData(turnData);
+            startTurn();
         }
     }, [startCount]);
 
+    // ターンが変わった後に次のプレイヤーのターンを開始する
     useEffect(() => {
         if (startCount === -1) {
-            const turnData = playerRefs[turn].current!.startTurn();
-            inputRef.current?.setTurnData(turnData);
+            startTurn();
         }
     }, [turn]);
 
@@ -118,7 +126,7 @@ function Game (props: {
             </div>
             <p>プレイヤー{turn + 1}の番です。</p>
             <Input
-                passTurn={passTurn}
+                passTurn={endTurn}
                 ref={inputRef}
             />
             <button onClick={switchPaused}>

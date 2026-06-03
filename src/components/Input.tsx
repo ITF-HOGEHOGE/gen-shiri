@@ -5,33 +5,7 @@ import { genRequestLen, InputRef, RequestLen, TurnData } from "./game";
 const Input = forwardRef((props: {
     passTurn: (addLength?: number) => void,
 }, ref: React.ForwardedRef<InputRef>) => {
-    // 使用済みの言葉
-    const usedWords = useRef<Set<string>>(new Set());
-
-    // 要求する文字列の頭文字
-    const [requestHead, setRequestHead] = useState<string>("り");
-    // 次の言葉の頭文字を決定
-    function getNextHead(word:string) {
-        let last_index = word.length - 1 - (useNmawashi ? 1 : 0);
-        if (word[last_index] === 'ー') {
-            last_index -= 1;
-        }
-        const last: string = word[last_index];
-        const smallToLarge: Record<string,string> = {
-            "ぁ": "あ",
-            "ぃ": "い",
-            "ぅ": "う",
-            "ぇ": "え",
-            "ぉ": "お",
-            "ゃ": "や",
-            "ゅ": "ゆ",
-            "ょ": "よ",
-            "っ": "つ",
-            "ゎ": "わ",
-        };
-        return smallToLarge[last] ?? last;
-    }
-
+    // wikiAPIから返ってきたJSONの型チェック
     const responseJsonCheck = (data: any): data is [string, string[], any, any] => {
         if (
             Array.isArray(data) 
@@ -137,6 +111,7 @@ const Input = forwardRef((props: {
     const [inputHiragana, setInputHiragana] = useState<string>("");
     // 入力された文字列のひらがな(未確定)
     const [inputHiraganaConverting, setInputHiraganaConverting] = useState<string>("");
+
     // 入力された文字列をすべて取得
     const getAllInput = () => {
         return input + inputConverting;
@@ -145,19 +120,6 @@ const Input = forwardRef((props: {
     const getAllInputHiragana = () => {
         return inputHiragana + inputHiraganaConverting;
     };
-
-    // 要求する文字列の長さ
-    const [requestLen, setRequestLen] = useState<RequestLen>(genRequestLen(0, 0, defaultSettingValues.wordLength.max));
-    const [lifeline, setLifeline] = useState<Lifeline>({
-        nmawashi: true,
-        pass: true,
-        lengthDown: true
-    });
-    const setTurnData = (value: TurnData) => {
-        setRequestLen(value.requestLen);
-        setLifeline(value.lifeline);
-    };
-
     // 入力をクリア
     const clearInput = () => {
         setInput("");
@@ -165,25 +127,8 @@ const Input = forwardRef((props: {
         setInputHiragana("");
         setInputHiraganaConverting("");
     };
-    // 変換終了時に実行
-    // 変換完了時と、変換中に対象の文字列をすべて消したときにも実行
-    const onCompositionEnd = () => {
-        if (inputConverting.length > 0) {
-            setInput((pre) => pre + inputConverting);
-            setInputHiragana((pre) => pre + inputHiraganaConverting);
-        }
-        setInputConverting("");
-        setInputHiraganaConverting("");
-    };
     // ひらがなのみからなるか、検査する正規表現
     const hiraganaRegex = /^\p{scx=Hiragana}+$/u;
-    // 変換中に実行され、ひらがな表示を更新
-    const updateHiraganaWhileConvering = (e: React.CompositionEvent<HTMLInputElement>) => {
-        if (hiraganaRegex.test(e.data)) {
-            setInputHiraganaConverting(e.data);
-        }
-    };
-
     // 入力が変更されたとき
     const onChange = (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
         // 入力された文字列
@@ -209,11 +154,68 @@ const Input = forwardRef((props: {
             setInput(eventValue);
         }
     };
+    // 変換終了時に実行
+    // 変換完了時と、変換中に対象の文字列をすべて消したときにも実行
+    const onCompositionEnd = () => {
+        if (inputConverting.length > 0) {
+            setInput((pre) => pre + inputConverting);
+            setInputHiragana((pre) => pre + inputHiraganaConverting);
+        }
+        setInputConverting("");
+        setInputHiraganaConverting("");
+    };
+    // 変換中に実行され、ひらがな表示を更新
+    const updateHiraganaWhileConvering = (e: React.CompositionEvent<HTMLInputElement>) => {
+        if (hiraganaRegex.test(e.data)) {
+            setInputHiraganaConverting(e.data);
+        }
+    };
+
+    // 使用済みの言葉
+    const usedWords = useRef<Set<string>>(new Set());
+
+    // 要求する文字列の頭文字
+    const [requestHead, setRequestHead] = useState<string>("り");
+    // 次の言葉の頭文字を決定
+    function getNextHead(word: string) {
+        let last_index = word.length - 1 - (useNmawashi ? 1 : 0);
+        if (word[last_index] === 'ー') {
+            last_index -= 1;
+        }
+        const last: string = word[last_index];
+        const smallToLarge: Record<string, string> = {
+            "ぁ": "あ",
+            "ぃ": "い",
+            "ぅ": "う",
+            "ぇ": "え",
+            "ぉ": "お",
+            "ゃ": "や",
+            "ゅ": "ゆ",
+            "ょ": "よ",
+            "っ": "つ",
+            "ゎ": "わ",
+        };
+        return smallToLarge[last] ?? last;
+    }
+
+    // 要求する文字列の長さ
+    const [requestLen, setRequestLen] = useState<RequestLen>(genRequestLen(0, 0, defaultSettingValues.wordLength.max));
+    // ライフライン
+    const [lifeline, setLifeline] = useState<Lifeline>({
+        nmawashi: true,
+        pass: true,
+        lengthDown: true
+    });
+    const setTurnData = (value: TurnData) => {
+        setRequestLen(value.requestLen);
+        setLifeline(value.lifeline);
+    };
 
     // ライフラインをこのターンで使用中か
     const [useNmawashi, setUseNmawashi] = useState(false);
     const [useLengthDown, setUseLengthDown] = useState(false);
 
+    // 親に関数を渡す
     useImperativeHandle(ref, () => ({setTurnData}))
 
     // 入力欄が空になったとき、ひらがな欄も空にする

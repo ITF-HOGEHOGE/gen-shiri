@@ -16,9 +16,10 @@ const Player = forwardRef((props: {
     // 時間を減らす定期実行のid
     const intervalId = useRef<number | null>(null);
 
+    // 残りのライフライン
     const lifeLine = useRef<Lifeline>({...props.playerData.lifeline});
 
-    // このプレイヤーのターンを始める
+    // ターンを始める
     const startTurn = (): TurnData => {
         if (intervalId.current === null) {
             intervalId.current = setInterval(() => {
@@ -32,6 +33,7 @@ const Player = forwardRef((props: {
             lifeline: lifeLine.current
         };
     };
+    // ターンを再開
     const resumeTurn = () => {
         if (intervalId.current === null) {
             intervalId.current = setInterval(() => {
@@ -39,7 +41,7 @@ const Player = forwardRef((props: {
             }, 1000);
         }
     };
-    // このプレイヤーのターンを終わる
+    // ターンを終わる
     const endTurn = (addLength?: number) => {
         if (intervalId.current !== null) {
             clearInterval(intervalId.current);
@@ -49,13 +51,21 @@ const Player = forwardRef((props: {
             setAddLength(addLength);
         }
     };
+    // ターンを一時停止する
     const pauseTurn = () => {
         if (intervalId.current !== null) {
             clearInterval(intervalId.current);
             intervalId.current = null;
         }
     };
+    
+    // 次の言葉の長さをランダムに決定
+    function getRandomLength() {
+        const { min, max } = props.playerData.wordLength;
+        return Math.floor(Math.random() * (max - min + 1)) + min + addLength;
+    }
 
+    // 引いた数字
     const [drawnLengthArray, setDrawnLengthArray] = useState<number[]>([]);
     const addDrawnLengthArray = (value: number) => {
         setDrawnLengthArray((pre) => {
@@ -68,11 +78,6 @@ const Player = forwardRef((props: {
 
     // 文字数減らしで増える文字数
     const [addLength, setAddLength] = useState<number>(0);
-    // 次の言葉の長さをランダムに決定
-    function getRandomLength() {
-        const { min, max } = props.playerData.wordLength;
-        return Math.floor(Math.random() * (max - min + 1)) + min + addLength;
-    }
     
     // 親でこれらの関数を使えるように
     useImperativeHandle(ref, () => ({startTurn, endTurn, resumeTurn, pauseTurn, getTime}));
