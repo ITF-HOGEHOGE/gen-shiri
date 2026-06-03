@@ -31,14 +31,12 @@ const PlayerSetting = forwardRef((props: {
             {
                 props.playerId === undefined
                 ?   <></>
-                :   <div className="player-settings-title-wrapper">
-                        <div className="player-settings-title">
-                            {
-                                props.playerId === 1
-                                ? "プレイヤー1"
-                                : "プレイヤー2"
-                            }
-                        </div>
+                :   <div className="player-settings-title">
+                        {
+                            props.playerId === 1
+                            ? "プレイヤー1"
+                            : "プレイヤー2"
+                        }
                     </div>
             }
             <div className="player-settings-input-wrapper">

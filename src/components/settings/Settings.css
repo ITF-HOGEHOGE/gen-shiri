@@ -58,11 +58,9 @@
     margin: 0 0 20px 0;
 }
 
-.player-settings-title-wrapper {
-    position: absolute;
-}
-
 .player-settings-title {
+    width: fit-content;
+    padding: 0 10px;
     background-color: rgb(251, 251, 252);
     position: relative;
     bottom: 40px;

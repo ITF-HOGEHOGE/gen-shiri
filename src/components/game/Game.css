@@ -1,7 +1,35 @@
+.game-count {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(40, 40, 40, 0.5);
+    position: fixed;
+    margin: calc(50% - 40px - 50vh + 36px) calc(50% - 40px - 50vw);
+    text-align: center;
+    font-size: 200px;
+    line-height: 100vh;
+}
+
+.game-count-inner {
+    animation: count 1s forwards;
+}
+
 .game-player-container {
     display: flex;
 }
 
 .game-empty {
     width: 50px;
+}
+
+@keyframes count {
+    0% {
+        font-size: 50%;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        font-size: 300px;
+    }
 }

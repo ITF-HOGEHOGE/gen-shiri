@@ -71,7 +71,6 @@ function Settings(props: {
                     </> 
                 :   <PlayerSettings ref={playerSettingsRefs[0]} />
             }
-            <p>スタートを押すとゲームが始まります</p>
             <button onClick={startGame}>スタート</button>
         </div>
     )

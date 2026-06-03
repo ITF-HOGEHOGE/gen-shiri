@@ -77,13 +77,41 @@ function Game (props: {
         props.setModeWrapper("result", { times: [playerRefs[0].current!.getTime(), playerRefs[1].current!.getTime()] });
     };
 
-    // 初回レンダリング時にターン開始
+    const [startCount, setStartCount] = useState<number>(4);
+    const countIntervalId = useRef<number | null>(null);
+
     useEffect(() => {
-        playerRefs[0].current?.startTurn();
+        if (countIntervalId.current === null) {
+            countIntervalId.current = setInterval(() => {
+                setStartCount((pre) => pre - 1);
+            }, 1000);
+        }
     }, []);
 
+    // 初回レンダリング時にターン開始
+    useEffect(() => {
+        if (startCount === -1 && countIntervalId.current !== null) {
+            playerRefs[0].current?.startTurn();
+            clearInterval(countIntervalId.current);
+            countIntervalId.current = null;
+        }
+    }, [startCount]);
+
     return(
-        <div>
+        <div className="game-container">
+            {
+                startCount === -1
+                ?   <></>
+                :   <div className="game-count">
+                        <div className="game-count-inner" key={startCount}>
+                            {
+                                startCount === 0
+                                ?   "スタート！"
+                                :   `${startCount}`
+                            }
+                        </div>
+                    </div>
+            }
             <div className="game-player-container">
                 <Player 
                     playerData={genPlayerData(0)}
@@ -151,19 +179,19 @@ function Game (props: {
                 }
             </div>
             <Input 
-                passTurn={passTurn}
-                useNmawashi={useNmawashi}
-                useLengthDown={useLengthDown} 
-                wordLength={[props.settings[0].wordLength, props.settings[1].wordLength]}
                 turn={turn}
-                lifeline={props.settings[turn].lifeline}
-                setUseLengthDown={setUseLengthDown}
-                setUseNmawashi={setUseNmawashi}
+                passTurn={passTurn}
                 requestLen={requestLen}
-                addLength={addLength}
                 setRequestLen={setRequestLen}
-                setAddLength={setAddLength}
                 getRandomLength={getRandomLength}
+                lifeline={props.settings[turn].lifeline}
+                useLengthDown={useLengthDown} 
+                setUseLengthDown={setUseLengthDown}
+                useNmawashi={useNmawashi}
+                setUseNmawashi={setUseNmawashi}
+                wordLength={[props.settings[0].wordLength, props.settings[1].wordLength]}
+                addLength={addLength}
+                setAddLength={setAddLength}
                 drawnLengthArray={drawnLengthArray}
                 setDrawnLengthArray={setDrawnLengthArray}
             />
