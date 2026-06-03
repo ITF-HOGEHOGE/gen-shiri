@@ -1,18 +1,38 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { PlayerData } from "..";
+import { genRequestLen, PlayerData, PlayerRef, RequestLen, TurnData } from ".";
 import "./Player.css"
+import { Lifeline } from "../settings";
 
 const Player = forwardRef((props: {
     playerData: PlayerData,
-    setModeResult: () => void
-    numList:number[][]
-}, ref) => {
+    setModeResult: () => void,
+}, ref: React.ForwardedRef<PlayerRef>) => {
     // 残り時間
     const [time, setTime] = useState<number>(props.playerData.time);
+    // 残り時間を取得
+    const getTime = () => {
+        return time;
+    };
     // 時間を減らす定期実行のid
     const intervalId = useRef<number | null>(null);
+
+    const lifeLine = useRef<Lifeline>({...props.playerData.lifeline});
+
     // このプレイヤーのターンを始める
-    const startTurn = () => {
+    const startTurn = (): TurnData => {
+        if (intervalId.current === null) {
+            intervalId.current = setInterval(() => {
+                setTime((pre) => pre - 1);
+            }, 1000);
+        }
+        const card = getRandomLength();
+        addDrawnLengthArray(card);
+        return {
+            requestLen: genRequestLen(card, addLength, props.playerData.wordLength.max),
+            lifeline: lifeLine.current
+        };
+    };
+    const resumeTurn = () => {
         if (intervalId.current === null) {
             intervalId.current = setInterval(() => {
                 setTime((pre) => pre - 1);
@@ -20,23 +40,47 @@ const Player = forwardRef((props: {
         }
     };
     // このプレイヤーのターンを終わる
-    const endTurn = () => {
+    const endTurn = (addLength?: number) => {
+        if (intervalId.current !== null) {
+            clearInterval(intervalId.current);
+            intervalId.current = null;
+        }
+        if (addLength !== undefined) {
+            setAddLength(addLength);
+        }
+    };
+    const pauseTurn = () => {
         if (intervalId.current !== null) {
             clearInterval(intervalId.current);
             intervalId.current = null;
         }
     };
-    // 残り時間を取得
-    const getTime = () => {
-        return time;
+
+    const [drawnLengthArray, setDrawnLengthArray] = useState<number[]>([]);
+    const addDrawnLengthArray = (value: number) => {
+        setDrawnLengthArray((pre) => {
+            const newArray = [...pre];
+            newArray.push(value);
+            console.log(newArray);
+            return newArray;
+        });
     };
+
+    // 文字数減らしで増える文字数
+    const [addLength, setAddLength] = useState<number>(0);
+    // 次の言葉の長さをランダムに決定
+    function getRandomLength() {
+        const { min, max } = props.playerData.wordLength;
+        return Math.floor(Math.random() * (max - min + 1)) + min + addLength;
+    }
     
     // 親でこれらの関数を使えるように
-    useImperativeHandle(ref, () => ({startTurn, endTurn, getTime}));
+    useImperativeHandle(ref, () => ({startTurn, endTurn, resumeTurn, pauseTurn, getTime}));
+
     // 残り時間が0なら結果画面へ
     useEffect(() => {
         if (time === 0) {
-            endTurn();
+            endTurn(0);
             props.setModeResult();
         }
     }, [time]);
@@ -48,7 +92,7 @@ const Player = forwardRef((props: {
                 残り<div className="player-timer">{time}</div>秒
             </div>
             <div>
-                今までに引いた数:{[props.numList[props.playerData.id-1]].join(',')}
+                今までに引いた数:{drawnLengthArray.join(',')}
             </div>
         </div>
     )

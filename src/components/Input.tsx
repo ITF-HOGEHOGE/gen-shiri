@@ -1,23 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { Lifeline, WordLength } from "./settings";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { defaultSettingValues, Lifeline } from "./settings";
+import { genRequestLen, InputRef, RequestLen, TurnData } from "./game";
 
-function Input(props: {
-    turn: number
-    passTurn: () => void,
-    requestLen: number,
-    setRequestLen: React.Dispatch<React.SetStateAction<number>>,
-    getRandomLength(turn: number): number,
-    lifeline: Lifeline,
-    useLengthDown: boolean,
-    setUseLengthDown: React.Dispatch<React.SetStateAction<boolean>>,
-    useNmawashi: boolean
-    setUseNmawashi: React.Dispatch<React.SetStateAction<boolean>>,
-    wordLength: [WordLength, WordLength],
-    addLength: number[],
-    setAddLength: React.Dispatch<React.SetStateAction<number[]>>,
-    drawnLengthArray: [number[], number[]],
-    setDrawnLengthArray: React.Dispatch<React.SetStateAction<[number[], number[]]>>,
-}) {
+const Input = forwardRef((props: {
+    passTurn: (addLength?: number) => void,
+}, ref: React.ForwardedRef<InputRef>) => {
     // 使用済みの言葉
     const usedWords = useRef<Set<string>>(new Set());
 
@@ -25,7 +12,7 @@ function Input(props: {
     const [requestHead, setRequestHead] = useState<string>("り");
     // 次の言葉の頭文字を決定
     function getNextHead(word:string) {
-        let last_index = word.length - 1 - (props.useNmawashi ? 1 : 0);
+        let last_index = word.length - 1 - (useNmawashi ? 1 : 0);
         if (word[last_index] === 'ー') {
             last_index -= 1;
         }
@@ -73,23 +60,23 @@ function Input(props: {
     // 入力が適切か判定
     const checkInput = async (input: string, hiraganaInput: string) => {
         // 文字列の長さチェック
-        if (props.useLengthDown === true){
+        if (useLengthDown === true){
             if (hiraganaInput.length < 2){
                 alert('2文字以上の言葉を入力して下さい')
                 return;
-            } else if (hiraganaInput.length >= props.requestLen) {
+            } else if (hiraganaInput.length >= requestLen.len) {
                 alert('文字数を減らすことができません')
                 return;
             }
         } else {
-            if (props.requestLen === props.wordLength[props.turn].max + props.addLength[props.turn]) {
-                if (hiraganaInput.length < props.requestLen) {
-                    alert(`${props.requestLen}文字以上の言葉を入力してください`);
+            if (requestLen.more) {
+                if (hiraganaInput.length < requestLen.len) {
+                    alert(`${requestLen.len}文字以上の言葉を入力してください`);
                     return;
                 }
             } else {
-                if (hiraganaInput.length !== props.requestLen) {
-                    alert(`${props.requestLen}文字の言葉を入力してください`);
+                if (hiraganaInput.length !== requestLen.len) {
+                    alert(`${requestLen.len}文字の言葉を入力してください`);
                     return;
                 }
             }
@@ -105,7 +92,7 @@ function Input(props: {
             return;
         }
         // ん回し使用時に最後の文字が「ん」になっているか
-        if (props.useNmawashi === true && hiraganaInput[hiraganaInput.length - 1] !== 'ん') {
+        if (useNmawashi === true && hiraganaInput[hiraganaInput.length - 1] !== 'ん') {
             alert('最後の文字が「ん」ではないため、ん回しは使えません');
             return;
         }
@@ -128,32 +115,18 @@ function Input(props: {
         // 使用済み単語を更新
         usedWords.current.add(hiraganaInput);
         // ん回し
-        if (props.useNmawashi === true) {
-            props.lifeline.nmawashi = false;
-            props.setUseNmawashi(false);
+        if (useNmawashi === true) {
+            lifeline.nmawashi = false;
+            setUseNmawashi(false);
         }
-        if (props.useLengthDown === true) {
-            props.lifeline.lengthDown = false;
-            props.setUseLengthDown(false);
+        if (useLengthDown === true) {
+            lifeline.lengthDown = false;
+            setUseLengthDown(false);
         }
 
-        // 引いた数のリストを更新
-        const card = props.getRandomLength(1 - props.turn) - props.addLength[1 - props.turn]
-        props.setRequestLen(card + props.addLength[1 - props.turn])
-        props.setDrawnLengthArray((pre) => {
-            const newList: [number[], number[]] = [[...pre[0]], [...pre[1]]] ;
-            newList[1 - props.turn].push(card);
-            return newList
-        });
-        // 文字数減らしで次に追加する文字数を更新
-        props.setAddLength((prev) => {
-            const next = [...prev];
-            next[props.turn] = Math.max(props.requestLen - hiraganaInput.length,0)
-            return next;
-        })
         setRequestHead(nextHead)
         clearInput();
-        props.passTurn();
+        props.passTurn(useLengthDown ? requestLen.len - hiraganaInput.length: 0);
     };
 
     // 入力された文字列(確定済み)
@@ -171,6 +144,18 @@ function Input(props: {
     // 入力された文字列のひらがなをすべて取得
     const getAllInputHiragana = () => {
         return inputHiragana + inputHiraganaConverting;
+    };
+
+    // 要求する文字列の長さ
+    const [requestLen, setRequestLen] = useState<RequestLen>(genRequestLen(0, 0, defaultSettingValues.wordLength.max));
+    const [lifeline, setLifeline] = useState<Lifeline>({
+        nmawashi: true,
+        pass: true,
+        lengthDown: true
+    });
+    const setTurnData = (value: TurnData) => {
+        setRequestLen(value.requestLen);
+        setLifeline(value.lifeline);
     };
 
     // 入力をクリア
@@ -225,6 +210,12 @@ function Input(props: {
         }
     };
 
+    // ライフラインをこのターンで使用中か
+    const [useNmawashi, setUseNmawashi] = useState(false);
+    const [useLengthDown, setUseLengthDown] = useState(false);
+
+    useImperativeHandle(ref, () => ({setTurnData}))
+
     // 入力欄が空になったとき、ひらがな欄も空にする
     useEffect(() => {
         if (input.length === 0) {
@@ -236,16 +227,53 @@ function Input(props: {
             setInputHiraganaConverting("");
         }
     }, [inputConverting]);
+
     return (
         <>
+            <div>
+                使えるライフライン
+                {
+                    lifeline.pass 
+                    ?   <button onClick={() => {
+                            lifeline.pass = false;
+                            props.passTurn();
+                        }
+                        }>パス</button>
+                    :   <></>
+                }
+                {
+                    lifeline.nmawashi 
+                    ?   <label>
+                            <input
+                                type='checkbox'
+                                checked={useNmawashi}
+                                onChange={(e) => setUseNmawashi(e.target.checked)}
+                            />
+                            ん回し
+                        </label>
+                    :   <></>
+                }
+                {
+                    lifeline.lengthDown
+                    ?   <label>
+                            <input
+                                type='checkbox'
+                                checked={useLengthDown}
+                                onChange={(e) => setUseLengthDown(e.target.checked)}
+                            />
+                            文字数減らし
+                        </label>
+                    :   <></>
+                }
+            </div>
             <p>
                 文字数:
                 {
-                    `${props.requestLen-props.addLength[props.turn]}${props.addLength[props.turn] ? `+${props.addLength[props.turn]}` : ""}`
+                    `${requestLen.len - requestLen.addLength}${requestLen.addLength !== 0 ? `+${requestLen.addLength}` : ""}`
                 }
                 文字
                 {
-                    props.requestLen === props.wordLength[props.turn].max + props.addLength[props.turn]
+                    requestLen.more
                     ?   "以上"
                     :   ""
                 }
@@ -273,6 +301,6 @@ function Input(props: {
             </div>
         </>
     )
-};
+});
 
 export default Input;
