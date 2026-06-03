@@ -1,7 +1,7 @@
 import { useRef, useState } from "react"
 import { SetModeWrapper } from "../../index";
 import PlayerSettings from "./PlayerSettings";
-import { PlayerSettingRef, SettingValues } from ".";
+import { copySettingValues, PlayerSettingRef, SettingValues } from ".";
 
 function Settings(props: {
     setModeWrapper: SetModeWrapper
@@ -42,15 +42,7 @@ function Settings(props: {
         // モード遷移
         const settings: [SettingValues, SettingValues] = useHandicap
             ? [inputs[0], inputs[1]]
-            : [{
-                time: inputs[0].time,
-                wordLength: inputs[0].wordLength,
-                lifeline: {...inputs[0].lifeline},
-            }, {
-                time: inputs[0].time,
-                wordLength: inputs[0].wordLength,
-                lifeline: {...inputs[0].lifeline},
-            }];
+            : [copySettingValues(inputs[0]), copySettingValues(inputs[0])];
         props.setModeWrapper(
             "game", 
             { settings }

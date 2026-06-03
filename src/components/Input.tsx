@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { WordLength } from "./settings";
+import { Lifeline, WordLength } from "./settings";
 
 function Input(props: {
     passTurn: () => void,
@@ -9,39 +9,27 @@ function Input(props: {
     useNmawashi: boolean
     wordLength: [WordLength, WordLength],
     turn: number
-    lifeline:{
-        nmawashi: boolean;
-        pass: boolean;
-        lengthDown: boolean;
-    }
-    requestLen:number
-    addLength:number[]
-    setRequestLen:React.Dispatch<React.SetStateAction<number>>
+    lifeline: Lifeline
+    requestLen: number
+    addLength: number[]
+    setRequestLen: React.Dispatch<React.SetStateAction<number>>
     setAddLength: React.Dispatch<React.SetStateAction<number[]>>
     getRandomLength(turn: number): number
-    numList:number[][]
-    setNumList:React.Dispatch<React.SetStateAction<number[][]>>
+    drawnLengthArray: [number[], number[]]
+    setDrawnLengthArray: React.Dispatch<React.SetStateAction<[number[], number[]]>>
 }) {
     // 使用済みの言葉
     const usedWords = useRef<Set<string>>(new Set());
-    
-
 
     // 要求する文字列の頭文字
     const [requestHead, setRequestHead] = useState<string>("り");
     // 次の言葉の頭文字を決定
     function getNextHead(word:string) {
-        let last: string = word[word.length - 1];
-        if (last === 'ー') {
-            last = word[word.length - 2];
+        let last_index = word.length - 1 - (props.useNmawashi ? 1 : 0);
+        if (word[last_index] === 'ー') {
+            last_index -= 1;
         }
-        if (props.useNmawashi === true) {
-            if (word[word.length-2] === 'ー'){
-                last = word[word.length-3]
-            }else{
-                last = word[word.length-2]
-            }
-        }
+        const last: string = word[last_index];
         const smallToLarge: Record<string,string> = {
             "ぁ": "あ",
             "ぃ": "い",
@@ -84,21 +72,22 @@ function Input(props: {
     }
     // 入力が適切か判定
     const checkInput = async (input: string, hiraganaInput: string) => {
+        // 文字列の長さチェック
         if (props.useLengthDown === true){
-                if (hiraganaInput.length < 2){
-                    alert('2文字以上の言葉を入力して下さい')
-                    return;
-                }else if(hiraganaInput.length >= props.requestLen) {
-                    alert('文字数を減らすことができません')
-                    return;
-                }
-        }else{
-            // 文字列の長さチェック
+            if (hiraganaInput.length < 2){
+                alert('2文字以上の言葉を入力して下さい')
+                return;
+            } else if (hiraganaInput.length >= props.requestLen) {
+                alert('文字数を減らすことができません')
+                return;
+            }
+        } else {
             if (props.requestLen === props.wordLength[props.turn].max + props.addLength[props.turn]) {
                 if (hiraganaInput.length < props.requestLen) {
                     alert(`${props.requestLen}文字以上の言葉を入力してください`);
-                    return;}
-            }else{
+                    return;
+                }
+            } else {
                 if (hiraganaInput.length !== props.requestLen) {
                     alert(`${props.requestLen}文字の言葉を入力してください`);
                     return;
@@ -115,6 +104,17 @@ function Input(props: {
             alert('その言葉は既に使われています')
             return;
         }
+        // ん回し使用時に最後の文字が「ん」になっているか
+        if (props.useNmawashi === true && hiraganaInput[hiraganaInput.length - 1] !== 'ん') {
+            alert('最後の文字が「ん」ではないため、ん回しは使えません');
+            return;
+        }
+        // 次の頭文字
+        const nextHead = getNextHead(hiraganaInput);
+        if (nextHead === 'ん'){
+            alert('「ん」で終わっています')
+            return;
+        }
         // 存在チェック
         const exists = await checkWord(input);
         if (!exists) {
@@ -125,37 +125,28 @@ function Input(props: {
                 return;
             }
         }
-        //ん回し使用時に最後の文字が「ん」になっているか
-        if (props.useNmawashi === true && hiraganaInput[hiraganaInput.length-1] !== 'ん') {
-            alert('最後の文字が「ん」ではないため、ん回しは使えません');
-            return;
-        }
-        // 次の頭文字
-        const nextHead = getNextHead(hiraganaInput);
-        if (nextHead === 'ん'){
-            alert('「ん」で終わっています')
-            return;
-        }
         // 使用済み単語を更新
         usedWords.current.add(hiraganaInput);
+        // ん回し
         if (props.useNmawashi === true) {
-            props.lifeline.nmawashi = false
+            props.lifeline.nmawashi = false;
+            props.setUseNmawashi(false);
         }
         if (props.useLengthDown === true) {
-            props.lifeline.lengthDown = false
+            props.lifeline.lengthDown = false;
+            props.setUseLengthDown(false);
         }
-        props.setUseLengthDown(false)
-        props.setUseNmawashi(false)
 
-        //引いた数のリストを更新
-        const card = props.getRandomLength(1-props.turn) - props.addLength[1-props.turn]
-        props.setRequestLen(card+props.addLength[1-props.turn])
-        const newList = [[...props.numList[0]],[...props.numList[1]]] 
-        newList[1-props.turn].push(card)
-        props.setNumList(newList)
-
-        //ん回しで次に追加する文字数を更新
-        props.setAddLength(prev => {
+        // 引いた数のリストを更新
+        const card = props.getRandomLength(1 - props.turn) - props.addLength[1 - props.turn]
+        props.setRequestLen(card + props.addLength[1 - props.turn])
+        props.setDrawnLengthArray((pre) => {
+            const newList: [number[], number[]] = [[...pre[0]], [...pre[1]]] ;
+            newList[1 - props.turn].push(card);
+            return newList
+        });
+        // 文字数減らしで次に追加する文字数を更新
+        props.setAddLength((prev) => {
             const next = [...prev];
             next[props.turn] = Math.max(props.requestLen - hiraganaInput.length,0)
             return next;
@@ -249,9 +240,14 @@ function Input(props: {
         <>
             <p>
                 文字数:
-                {props.requestLen === props.wordLength[props.turn].max + props.addLength[props.turn]
-                    ? `${props.requestLen-props.addLength[props.turn]}${props.addLength[props.turn] ? `+${props.addLength[props.turn]}` : ""}文字以上`
-                    : `${props.requestLen-props.addLength[props.turn]}${props.addLength[props.turn] ? `+${props.addLength[props.turn]}` : ""}文字`
+                {
+                    `${props.requestLen-props.addLength[props.turn]}${props.addLength[props.turn] ? `+${props.addLength[props.turn]}` : ""}`
+                }
+                文字
+                {
+                    props.requestLen === props.wordLength[props.turn].max + props.addLength[props.turn]
+                    ?   "以上"
+                    :   ""
                 }
             </p>
             <p>最初の文字: {requestHead}</p>

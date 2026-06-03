@@ -7,7 +7,7 @@ const PlayerSetting = forwardRef((props: {
     const [inputTime, setInputTime] = useState(300);
     const [inputMinWordLength, setInputMinWordLength] = useState(2);
     const [inputMaxWordLength, setInputMaxWordLength] = useState(8);
-    const [lifeline,setLifeline] = useState({
+    const [lifeline, setLifeline] = useState({
         nmawashi: true,
         pass: true,
         lengthDown: true
