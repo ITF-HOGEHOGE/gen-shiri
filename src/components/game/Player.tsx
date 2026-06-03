@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { PlayerData } from ".";
+import { PlayerData } from "..";
 import "./Player.css"
 
 const Player = forwardRef((props: {

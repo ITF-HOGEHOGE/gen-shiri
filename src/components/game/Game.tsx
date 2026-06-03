@@ -1,10 +1,10 @@
 import { useEffect, useRef ,useState } from "react";
-import { PlayerRef } from "./index";
-import { SetModeWrapper } from "..";
+import { PlayerRef } from "../index";
+import { SetModeWrapper } from "../..";
 import Player from "./Player";
-import Input from "./Input";
+import Input from "../Input";
 import "./Game.css";
-import { SettingValues } from "./settings";
+import { SettingValues } from "../settings";
 
 function Game (props: {
     settings: [SettingValues, SettingValues]

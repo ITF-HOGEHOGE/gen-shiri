@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Mode, SetModeWrapper } from '.';
-import Game from "./components/Game"
+import Game from "./components/game/Game"
 import Setting from "./components/settings/Setting"
 import { defaultSettingValues, SettingValues } from './components/settings';
 
