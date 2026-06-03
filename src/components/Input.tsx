@@ -2,21 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { Lifeline, WordLength } from "./settings";
 
 function Input(props: {
-    passTurn: () => void,
-    setUseNmawashi: React.Dispatch<React.SetStateAction<boolean>>,
-    setUseLengthDown: React.Dispatch<React.SetStateAction<boolean>>,
-    useLengthDown: boolean
-    useNmawashi: boolean
-    wordLength: [WordLength, WordLength],
     turn: number
-    lifeline: Lifeline
-    requestLen: number
-    addLength: number[]
-    setRequestLen: React.Dispatch<React.SetStateAction<number>>
-    setAddLength: React.Dispatch<React.SetStateAction<number[]>>
-    getRandomLength(turn: number): number
-    drawnLengthArray: [number[], number[]]
-    setDrawnLengthArray: React.Dispatch<React.SetStateAction<[number[], number[]]>>
+    passTurn: () => void,
+    requestLen: number,
+    setRequestLen: React.Dispatch<React.SetStateAction<number>>,
+    getRandomLength(turn: number): number,
+    lifeline: Lifeline,
+    useLengthDown: boolean,
+    setUseLengthDown: React.Dispatch<React.SetStateAction<boolean>>,
+    useNmawashi: boolean
+    setUseNmawashi: React.Dispatch<React.SetStateAction<boolean>>,
+    wordLength: [WordLength, WordLength],
+    addLength: number[],
+    setAddLength: React.Dispatch<React.SetStateAction<number[]>>,
+    drawnLengthArray: [number[], number[]],
+    setDrawnLengthArray: React.Dispatch<React.SetStateAction<[number[], number[]]>>,
 }) {
     // 使用済みの言葉
     const usedWords = useRef<Set<string>>(new Set());

@@ -1,7 +1,8 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { copySettingValues, PlayerSettingRef, SettingValues } from ".";
 import { SetModeWrapper } from "../../index";
 import PlayerSettings from "./PlayerSettings";
-import { copySettingValues, PlayerSettingRef, SettingValues } from ".";
+import "./Settings.css"
 
 function Settings(props: {
     setModeWrapper: SetModeWrapper
@@ -51,15 +52,17 @@ function Settings(props: {
 
     return (
         <div>
-            <p>ルールを決めてください。</p>
-            <label>
-                <input
-                    type='checkbox'
-                    checked={useHandicap}
-                    onChange={(e) => setUseHandicap(e.target.checked)}
-                />
-                ハンデを使用する
-            </label>
+            <p className="settings-title">ルール設定</p>
+            <div className="settings-checkbox-wrapper">
+                <div className="settings-checkbox-label">▶ハンデを使用する</div>
+                <button
+                    className={"settings-checkbox" + (useHandicap ? " settings-checkbox-on" : " settings-checkbox-off")}
+                    type="button"
+                    onClick={() => setUseHandicap((pre) => !pre)}
+                >
+                    <div className={"settings-checkbox-inner" + (useHandicap ? " settings-checkbox-inner-on" : " settings-checkbox-inner-off")}></div>
+                </button>
+            </div>
             {
                 useHandicap 
                 ?   <>

@@ -11,7 +11,7 @@ const PlayerSetting = forwardRef((props: {
         nmawashi: true,
         pass: true,
         lengthDown: true
-    })
+    });
 
     const getInput = (): SettingValues => {
         return {
@@ -27,16 +27,26 @@ const PlayerSetting = forwardRef((props: {
     useImperativeHandle(ref, () => ({getInput}));
 
     return (
-        <div>
-            <div>
-                プレイヤー{
-                    props.playerId === undefined
-                    ? ""
-                    : props.playerId === 1
-                    ? "1"
-                    : "2"
-                }の持ち時間(秒)
+        <div className="player-settings-container">
+            {
+                props.playerId === undefined
+                ?   <></>
+                :   <div className="player-settings-title-wrapper">
+                        <div className="player-settings-title">
+                            {
+                                props.playerId === 1
+                                ? "プレイヤー1"
+                                : "プレイヤー2"
+                            }
+                        </div>
+                    </div>
+            }
+            <div className="player-settings-input-wrapper">
+                <div className="player-settings-input-label">
+                    持ち時間(秒)
+                </div>
                 <input
+                    className="player-settings-input"
                     type='number'
                     value={inputTime}
                     onChange={(e) => {
@@ -44,15 +54,12 @@ const PlayerSetting = forwardRef((props: {
                     }}
                 />
             </div>
-            <div>
-                {
-                    props.playerId === undefined
-                    ? ""
-                    : props.playerId === 1
-                    ? "プレイヤー1"
-                    : "プレイヤー2"
-                }の最小の文字数(2以上)
+            <div className="player-settings-input-wrapper">
+                <div className="player-settings-input-label">
+                    最小の文字数(2以上)
+                </div>
                 <input
+                    className="player-settings-input"
                     type='number'
                     value={inputMinWordLength}
                     onChange={(e) => {
@@ -60,15 +67,12 @@ const PlayerSetting = forwardRef((props: {
                     }}
                 />
             </div>
-            <div>
-                {
-                    props.playerId === undefined
-                    ? ""
-                    : props.playerId === 1
-                    ? "プレイヤー1"
-                    : "プレイヤー2"
-                }の最大の文字数(2以上)
+            <div className="player-settings-input-wrapper">
+                <div className="player-settings-input-label">
+                    最大の文字数(2以上)
+                </div>
                 <input
+                    className="player-settings-input"
                     type='number'
                     value={inputMaxWordLength}
                     onChange={(e) => {
@@ -77,64 +81,49 @@ const PlayerSetting = forwardRef((props: {
                 />
             </div>
             <div>
-                ライフライン
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={lifeline.nmawashi}
-                        onChange={(e) =>
-                            setLifeline(prev => ({
-                                ...prev,
-                                nmawashi: e.target.checked
-                            }))
-                        }
-                    />
-                    {
-                        props.playerId === undefined
-                        ? ""
-                        : props.playerId === 1
-                        ? "プレイヤー1"
-                        : "プレイヤー2"
-                    }ん回し
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={lifeline.pass}
-                        onChange={(e) =>
-                            setLifeline(prev => ({
-                                ...prev,
-                                pass: e.target.checked
-                            }))
-                        }
-                    />
-                    {
-                        props.playerId === undefined
-                        ? ""
-                        : props.playerId === 1
-                        ? "プレイヤー1"
-                        : "プレイヤー2"
-                    }パス
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={lifeline.lengthDown}
-                        onChange={(e) =>
-                            setLifeline(prev => ({
-                                ...prev,
-                                lengthDown: e.target.checked
-                            }))
-                        }
-                    />
-                    {
-                        props.playerId === undefined
-                        ? ""
-                        : props.playerId === 1
-                        ? "プレイヤー1"
-                        : "プレイヤー2"
-                    }文字数減らし
-                </label>
+
+            ライフライン
+            <div className="player-settings-lifeline-container">
+                <button 
+                    className={"player-settings-lifeline" + (lifeline.nmawashi ? "" : " player-settings-lifeline-off")}
+                    onClick={() =>
+                        setLifeline(prev => ({
+                            ...prev,
+                            nmawashi: !prev.nmawashi
+                        }))
+                    }
+                >
+                    <div>
+                        ん回し
+                    </div>
+                </button>
+                <button 
+                    className={"player-settings-lifeline" + (lifeline.pass ? "" : " player-settings-lifeline-off")}
+                    onClick={() =>
+                        setLifeline(prev => ({
+                            ...prev,
+                            pass: !prev.pass
+                        }))
+                    }
+                >
+                    <div>
+                        パス
+                    </div>
+                </button>
+                <button 
+                    className={"player-settings-lifeline" + (lifeline.lengthDown ? "" : " player-settings-lifeline-off")}
+                    onClick={() =>
+                        setLifeline(prev => ({
+                            ...prev,
+                            lengthDown: !prev.lengthDown
+                        }))
+                    }
+                >
+                    <div>
+                        文字数減らし
+                    </div>
+                </button>
+            </div>
             </div>
         </div>
     )

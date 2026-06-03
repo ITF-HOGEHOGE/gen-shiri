@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Mode, SetModeWrapper } from '.';
 import Game from "./components/game/Game"
-import Setting from "./components/settings/Setting"
+import Setting from "./components/settings/Settings"
 import { defaultSettingValues, SettingValues } from './components/settings';
 
 function App() {
