@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { genRequestLen, PlayerData, PlayerRef, RequestLen, TurnData } from ".";
-import "./Player.css"
 import { Lifeline } from "../settings";
+import "./Player.css"
 
 const Player = forwardRef((props: {
     playerData: PlayerData,
@@ -58,7 +58,7 @@ const Player = forwardRef((props: {
             intervalId.current = null;
         }
     };
-    
+
     // 次の言葉の長さをランダムに決定
     function getRandomLength() {
         const { min, max } = props.playerData.wordLength;
@@ -71,7 +71,6 @@ const Player = forwardRef((props: {
         setDrawnLengthArray((pre) => {
             const newArray = [...pre];
             newArray.push(value);
-            console.log(newArray);
             return newArray;
         });
     };
@@ -96,8 +95,15 @@ const Player = forwardRef((props: {
             <div className="player-timer-container">
                 残り<div className="player-timer">{time}</div>秒
             </div>
-            <div>
-                今までに引いた数:{drawnLengthArray.join(',')}
+            <div className="player-card-container">
+                <div className="player-card-dummy"></div>
+                {
+                    drawnLengthArray.map((v, i) => (
+                        <div className="player-card" style={{left: -10 * i}} key={i}>
+                            {v}
+                        </div>
+                    ))
+                }
             </div>
         </div>
     )

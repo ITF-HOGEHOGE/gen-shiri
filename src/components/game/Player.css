@@ -11,7 +11,7 @@
 .player-player-name {
     font-size: 32px;
     text-align: center;
-    margin: 0 0 50px 0;
+    margin: 0 0 20px 0;
 }
 
 .player-timer-container {
@@ -22,4 +22,22 @@
 .player-timer {
     font-size: 64px;
     margin: 0 auto;
+}
+
+.player-card-container {
+    display: flex;
+    padding: 5px;
+}
+
+.player-card {
+    width: 30px;
+    height: 50px;
+    border: 1px solid rgb(10, 10, 10);
+    border-radius: 5px;
+    position: relative;
+    background-color: rgb(240, 240, 240);
+}
+
+.player-card-dummy {
+    height: 50px;
 }

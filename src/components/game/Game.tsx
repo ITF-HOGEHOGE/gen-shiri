@@ -16,8 +16,9 @@ function Game (props: {
     const switchTurn = () => {
         setTurn((pre) => 1 - pre);
     };
+    // ターンを始める
     const startTurn = () => {
-        const turnData = playerRefs[0].current!.startTurn();
+        const turnData = playerRefs[turn].current!.startTurn();
         inputRef.current?.setTurnData(turnData);
     };
     // 次のターンに進む
@@ -124,9 +125,8 @@ function Game (props: {
                     ))
                 }
             </div>
-            <p>プレイヤー{turn + 1}の番です。</p>
             <Input
-                passTurn={endTurn}
+                endTurn={endTurn}
                 ref={inputRef}
             />
             <button onClick={switchPaused}>

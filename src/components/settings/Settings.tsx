@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { copySettingValues, PlayerSettingRef, SettingValues } from ".";
 import { SetModeWrapper } from "../../index";
-import PlayerSettings from "./PlayerSettings";
+import PlayerSettings from "./PlayerSetting";
 import "./Settings.css"
 
 function Settings(props: {

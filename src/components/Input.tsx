@@ -3,7 +3,7 @@ import { defaultSettingValues, Lifeline } from "./settings";
 import { genRequestLen, InputRef, RequestLen, TurnData } from "./game";
 
 const Input = forwardRef((props: {
-    passTurn: (addLength?: number) => void,
+    endTurn: (addLength?: number) => void,
 }, ref: React.ForwardedRef<InputRef>) => {
     // wikiAPIから返ってきたJSONの型チェック
     const responseJsonCheck = (data: any): data is [string, string[], any, any] => {
@@ -100,7 +100,7 @@ const Input = forwardRef((props: {
 
         setRequestHead(nextHead)
         clearInput();
-        props.passTurn(useLengthDown ? requestLen.len - hiraganaInput.length: 0);
+        props.endTurn(useLengthDown ? requestLen.len - hiraganaInput.length: 0);
     };
 
     // 入力された文字列(確定済み)
@@ -109,7 +109,7 @@ const Input = forwardRef((props: {
     const [inputConverting, setInputConverting] = useState<string>("");
     // 入力された文字列のひらがな(確定済み)
     const [inputHiragana, setInputHiragana] = useState<string>("");
-    // 入力された文字列のひらがな(未確定)
+    // 入力された文字列のひらがな(変換中)
     const [inputHiraganaConverting, setInputHiraganaConverting] = useState<string>("");
 
     // 入力された文字列をすべて取得
@@ -178,11 +178,11 @@ const Input = forwardRef((props: {
     const [requestHead, setRequestHead] = useState<string>("り");
     // 次の言葉の頭文字を決定
     function getNextHead(word: string) {
-        let last_index = word.length - 1 - (useNmawashi ? 1 : 0);
-        if (word[last_index] === 'ー') {
-            last_index -= 1;
+        let lastIndex = word.length - 1 - (useNmawashi ? 1 : 0);
+        if (word[lastIndex] === 'ー') {
+            lastIndex -= 1;
         }
-        const last: string = word[last_index];
+        const last: string = word[lastIndex];
         const smallToLarge: Record<string, string> = {
             "ぁ": "あ",
             "ぃ": "い",
@@ -238,7 +238,7 @@ const Input = forwardRef((props: {
                     lifeline.pass 
                     ?   <button onClick={() => {
                             lifeline.pass = false;
-                            props.passTurn();
+                            props.endTurn();
                         }
                         }>パス</button>
                     :   <></>
